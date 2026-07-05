@@ -1,15 +1,17 @@
 ---
+import { withBase } from '../lib/url';
 const tabs = [
   { href: '/data-portal', label: 'Datasets' },
   { href: '/data-portal/map', label: 'Map' },
   { href: '/data-portal/papers', label: 'Papers' },
 ];
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const norm = (p: string) => p.replace(/\/$/, '') || '/';
+const path = norm(Astro.url.pathname);
 ---
 <nav class="tabs" aria-label="Data portal views">
   <div class="wrap tabs-in">
     {tabs.map((t) => (
-      <a href={t.href} aria-current={path === t.href ? 'page' : undefined}>{t.label}</a>
+      <a href={withBase(t.href)} aria-current={path === norm(withBase(t.href)) ? 'page' : undefined}>{t.label}</a>
     ))}
   </div>
 </nav>

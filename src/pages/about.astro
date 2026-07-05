@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import { CONTACTS, MAILING_LIST_URL } from '../consts';
+import { withBase } from '../lib/url';
 
 // Curated external resources (from the current site's "Other Resources").
 const resources = [
@@ -37,8 +38,8 @@ const resources = [
 
       <h2>How it runs</h2>
       <p>The group meets once or twice a year — typically around 50 participants — hosted in rotation by member
-        institutions. Talks and slides from each meeting are archived on the <a href="/meetings">Meetings</a> page.
-        The <a href="/data-portal">Data Portal</a> collects datasets from field, laboratory and CFD studies so
+        institutions. Talks and slides from each meeting are archived on the <a href={withBase('/meetings')}>Meetings</a> page.
+        The <a href={withBase('/data-portal')}>Data Portal</a> collects datasets from field, laboratory and CFD studies so
         they can be found, compared and reused.</p>
 
       <h2>Organisers &amp; contact</h2>

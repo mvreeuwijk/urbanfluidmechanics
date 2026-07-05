@@ -1,5 +1,6 @@
 ---
 import { featuredMeeting, formatMeetingDate } from '../data/meetings';
+import { withBase } from '../lib/url';
 
 // Computed at build time. Shows the NEXT upcoming meeting, or falls back to the
 // LAST meeting once it has passed. Hidden entirely if there are no meetings.
@@ -12,7 +13,7 @@ const featured = featuredMeeting(new Date());
       <span class="txt">
         {featured.meeting.label} · {formatMeetingDate(featured.meeting)} · {featured.meeting.host}
       </span>
-      <a href={`/meetings/${featured.meeting.slug}`}>
+      <a href={withBase(`/meetings/${featured.meeting.slug}`)}>
         {featured.kind === 'next' ? 'See the programme →' : 'View slides →'}
       </a>
       <button class="ann-x" type="button" aria-label="Dismiss announcement" data-dismiss>×</button>

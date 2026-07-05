@@ -1,8 +1,11 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { CHALLENGES } from '../data/challenges';
 import { MEETINGS, meetingsByDateDesc, formatMeetingDate } from '../data/meetings';
 import { MAILING_LIST_URL } from '../consts';
+import { withBase } from '../lib/url';
+import heroImg from '../assets/images/wind-tunnel-model.jpg';
 
 const recentMeetings = meetingsByDateDesc.slice(0, 3);
 const meetingCount = MEETINGS.length;
@@ -19,47 +22,8 @@ const teaser = [
 <Base>
   <!-- ============ HERO ============ -->
   <div class="hero">
-    <svg class="scene" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-      <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#12384a" /><stop offset=".45" stop-color="#1c556a" />
-          <stop offset=".8" stop-color="#3f7f8a" /><stop offset="1" stop-color="#6ba7ad" />
-        </linearGradient>
-        <radialGradient id="sun" cx="72%" cy="26%" r="34%">
-          <stop offset="0" stop-color="#ffe4c2" stop-opacity=".85" /><stop offset="1" stop-color="#ffe4c2" stop-opacity="0" />
-        </radialGradient>
-      </defs>
-      <rect width="1200" height="500" fill="url(#sky)" />
-      <rect width="1200" height="500" fill="url(#sun)" />
-      <g fill="#2b5c6c" opacity=".55">
-        <rect x="40" y="300" width="70" height="200" /><rect x="130" y="260" width="55" height="240" />
-        <rect x="210" y="320" width="80" height="180" /><rect x="320" y="280" width="48" height="220" />
-        <rect x="700" y="300" width="70" height="200" /><rect x="800" y="270" width="60" height="230" />
-        <rect x="900" y="315" width="85" height="185" /><rect x="1010" y="285" width="55" height="215" /><rect x="1090" y="320" width="70" height="180" />
-      </g>
-      <g fill="#1c4655" opacity=".82">
-        <rect x="90" y="340" width="70" height="160" /><rect x="180" y="300" width="64" height="200" />
-        <rect x="270" y="360" width="90" height="140" /><rect x="380" y="320" width="70" height="180" />
-        <rect x="470" y="270" width="58" height="230" /><rect x="560" y="340" width="80" height="160" />
-        <rect x="660" y="310" width="66" height="190" /><rect x="760" y="350" width="88" height="150" />
-        <rect x="870" y="300" width="60" height="200" /><rect x="960" y="345" width="78" height="155" /><rect x="1060" y="315" width="70" height="185" />
-      </g>
-      <g fill="#0c2a35">
-        <rect x="20" y="380" width="96" height="120" /><rect x="130" y="350" width="80" height="150" />
-        <rect x="225" y="400" width="70" height="100" /><rect x="310" y="360" width="104" height="140" />
-        <rect x="430" y="330" width="72" height="170" /><rect x="520" y="390" width="96" height="110" />
-        <rect x="630" y="355" width="84" height="145" /><rect x="730" y="405" width="70" height="95" />
-        <rect x="815" y="345" width="100" height="155" /><rect x="930" y="385" width="86" height="115" /><rect x="1035" y="360" width="92" height="140" />
-      </g>
-      <g fill="#ffd9a8" opacity=".5">
-        <rect x="330" y="380" width="6" height="8" /><rect x="345" y="380" width="6" height="8" /><rect x="330" y="400" width="6" height="8" /><rect x="345" y="400" width="6" height="8" />
-        <rect x="450" y="360" width="6" height="8" /><rect x="450" y="380" width="6" height="8" /><rect x="835" y="370" width="6" height="8" /><rect x="850" y="370" width="6" height="8" /><rect x="835" y="392" width="6" height="8" />
-      </g>
-      <g class="streams" stroke="#bfe6ea" fill="none" stroke-width="1.6" opacity=".5" stroke-linecap="round">
-        <path d="M-20 120 C 300 80, 560 150, 900 100 S 1240 95 1240 120" />
-        <path d="M-20 180 C 340 140, 620 205, 980 160 S 1240 160 1240 185" style="animation-delay:-2s" />
-      </g>
-    </svg>
+    <Image class="scene" src={heroImg} alt="A scaled physical model of a city under study in a wind tunnel"
+      widths={[768, 1280, 1920]} sizes="100vw" loading="eager" fetchpriority="high" />
     <div class="veil"></div>
     <div class="wrap hero-in">
       <div class="eyebrow hero-eyebrow">Open research community</div>
@@ -68,8 +32,8 @@ const teaser = [
         of the city — inside and between buildings, through the urban canopy, and up into the atmospheric
         boundary layer — and sharing the data, models and meetings behind the science.</p>
       <div class="cta">
-        <a class="btn primary" href="/data-portal">Explore the data portal →</a>
-        <a class="btn ghost onhero" href="/meetings">Meetings &amp; talks</a>
+        <a class="btn primary" href={withBase('/data-portal')}>Explore the data portal →</a>
+        <a class="btn ghost onhero" href={withBase('/meetings')}>Meetings &amp; talks</a>
       </div>
     </div>
   </div>
@@ -89,11 +53,11 @@ const teaser = [
       </div>
         <p class="lead">Spanning fundamental to applied research — experimental, numerical and theoretical —
           organised around five shared challenges, revised in 2025 to reflect net zero, resilience and the
-          rise of data-driven methods. <a href="/research">Read more →</a></p>
+          rise of data-driven methods. <a href={withBase('/research')}>Read more →</a></p>
       </div>
       <div class="challenges">
         {CHALLENGES.map((c) => (
-          <a class="ch" href={`/research#${c.id}`}>
+          <a class="ch" href={withBase(`/research#${c.id}`)}>
             <span class="tag mono">{c.id}</span>
             <h3>{c.title}</h3>
             <p>{c.short}</p>
@@ -115,7 +79,7 @@ const teaser = [
       <div class="portal-grid">
         <div class="panel">
           <div class="panel-top"><span class="ttl">Datasets</span>
-            <a class="count link-arrow" href="/data-portal">Open the full portal →</a></div>
+            <a class="count link-arrow" href={withBase('/data-portal')}>Open the full portal →</a></div>
           <table>
             <thead><tr><th>Dataset</th><th>Type</th><th>City</th></tr></thead>
             <tbody>
@@ -125,7 +89,7 @@ const teaser = [
             </tbody>
           </table>
         </div>
-        <a class="panel map" href="/data-portal/map" aria-label="Open the map view">
+        <a class="panel map" href={withBase('/data-portal/map')} aria-label="Open the map view">
           <svg viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <g stroke="var(--line)" stroke-width="1" opacity=".8">
               <path d="M0 64 H400 M0 128 H400 M0 192 H400 M0 256 H400" fill="none" />
@@ -157,7 +121,7 @@ const teaser = [
       </div>
       <div class="mgrid">
         {recentMeetings.map((m) => (
-          <a class="mcard" href={`/meetings/${m.slug}`}>
+          <a class="mcard" href={withBase(`/meetings/${m.slug}`)}>
             <div class="mdate mono">{formatMeetingDate(m)}</div>
             <h3>{m.label}</h3>
             <div class="mloc">{m.host}</div>
@@ -168,7 +132,7 @@ const teaser = [
           </a>
         ))}
       </div>
-      <p class="meet-foot"><a class="link-arrow" href="/meetings">Browse all {meetingCount} meetings →</a></p>
+      <p class="meet-foot"><a class="link-arrow" href={withBase('/meetings')}>Browse all {meetingCount} meetings →</a></p>
     </div>
   </section>
 
@@ -184,7 +148,7 @@ const teaser = [
         government, in the UK and beyond. There is no membership fee; anyone working on the fluid mechanics of
         cities is welcome to <a href={MAILING_LIST_URL} target="_blank" rel="noopener">join the mailing list</a>,
         come to a meeting, and add datasets to the portal.</p>
-      <p style="margin-top:18px"><a class="link-arrow" href="/about">Read the full story &amp; how to get involved →</a></p>
+      <p style="margin-top:18px"><a class="link-arrow" href={withBase('/about')}>Read the full story &amp; how to get involved →</a></p>
     </div>
   </section>
 </Base>
@@ -192,7 +156,7 @@ const teaser = [
 <style>
   /* hero */
   .hero { position: relative; overflow: hidden; background: #0b1f2a; min-height: 460px; display: flex; align-items: flex-end; }
-  .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; }
   .veil { position: absolute; inset: 0; background:
       linear-gradient(180deg, rgba(9,28,38,.15) 0%, rgba(9,25,35,.35) 45%, rgba(8,22,31,.86) 100%),
       linear-gradient(90deg, rgba(8,22,31,.75) 0%, rgba(8,22,31,.15) 60%, transparent 100%); }

@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import PortalTabs from '../../components/PortalTabs.astro';
 import { datasets, facet, primaryType, TYPE_LABEL, DATA_IS_SYNTHETIC } from '../../lib/datasets';
+import cfdBanner from '../../assets/images/cfd-dispersion.jpg';
 
 const methods = facet('method');
 const morphologies = facet('morphology');
@@ -18,6 +19,8 @@ const searchable = (d: typeof datasets[number]) =>
     eyebrow="Data portal"
     title="Urban fluid mechanics datasets"
     lead="Field experiments, laboratory & physical-model studies and CFD, contributed by the community. Search and filter below; the same records appear on the map and in the papers list. When multiple filters are set, all must match."
+    image={cfdBanner}
+    imageAlt="CFD simulation of scalar dispersion through an array of buildings"
   />
   <PortalTabs />
 

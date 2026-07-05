@@ -23,3 +23,7 @@ npm-debug.log*
 
 # tmp dir
 /tmp/
+
+# heavy original banner downloads (optimized copies live in src/assets/images)
+/public/images/
+*-b64.json

@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { MEETINGS, formatMeetingDate, type Meeting } from '../../data/meetings';
+import { withBase } from '../../lib/url';
 
 export function getStaticPaths() {
   return MEETINGS.map((m) => ({ params: { slug: m.slug }, props: { meeting: m } }));
@@ -45,7 +46,7 @@ const archivedUrl = `https://www.urbanfluidmechanics.org/meetings/${meeting.slug
         </div>
       )}
 
-      <p class="back"><a class="link-arrow" href="/meetings">← All meetings</a></p>
+      <p class="back"><a class="link-arrow" href={withBase('/meetings')}>← All meetings</a></p>
     </div>
   </section>
 </Base>

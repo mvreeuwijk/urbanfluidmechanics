@@ -1,5 +1,6 @@
 ---
 import { SITE, NAV, CONTACTS, MAILING_LIST_URL } from '../consts';
+import { withBase } from '../lib/url';
 const year = new Date().getFullYear();
 ---
 <footer class="footer">
@@ -10,7 +11,7 @@ const year = new Date().getFullYear();
     </div>
     <div>
       <h4>Explore</h4>
-      <ul>{NAV.map((n) => <li><a href={n.href}>{n.label}</a></li>)}</ul>
+      <ul>{NAV.map((n) => <li><a href={withBase(n.href)}>{n.label}</a></li>)}</ul>
     </div>
     <div>
       <h4>Get in touch</h4>

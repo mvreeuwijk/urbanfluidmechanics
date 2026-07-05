@@ -3,6 +3,8 @@ import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import PortalTabs from '../../components/PortalTabs.astro';
 import { papers, DATA_IS_SYNTHETIC } from '../../lib/datasets';
+import { withBase } from '../../lib/url';
+import fieldBanner from '../../assets/images/field-masts.jpg';
 
 const list = papers();
 // group by year (desc)
@@ -16,7 +18,9 @@ const years = [...byYear.keys()].sort((a, b) => b - a);
 ---
 <Base title="Data Portal — Papers" description="Key articles associated with urban fluid mechanics datasets, listed chronologically.">
   <PageHeader eyebrow="Data portal" title="Papers"
-    lead="The key article behind each dataset, most recent first. Follow a paper through to its dataset." />
+    lead="The key article behind each dataset, most recent first. Follow a paper through to its dataset."
+    image={fieldBanner}
+    imageAlt="Sonic anemometers on masts during an urban field campaign" />
   <PortalTabs />
 
   {DATA_IS_SYNTHETIC && (
@@ -35,7 +39,7 @@ const years = [...byYear.keys()].sort((a, b) => b - a);
                 <p class="ptitle">
                   {p.doi ? <a href={`https://doi.org/${p.doi}`} target="_blank" rel="noopener">{p.title}</a> : p.title}
                 </p>
-                <p class="pmeta">{p.institution} · dataset: <a href={`/data-portal#${p.datasetId}`}>{p.datasetName}</a></p>
+                <p class="pmeta">{p.institution} · dataset: <a href={withBase(`/data-portal#${p.datasetId}`)}>{p.datasetName}</a></p>
               </li>
             ))}
           </ul>

@@ -1,14 +1,19 @@
 ---
 import { NAV, SITE, MAILING_LIST_URL } from '../consts';
+import { withBase } from '../lib/url';
 import Logo from './Logo.astro';
 
-// active-link matching against the current path
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
+// active-link matching against the current path (base-aware)
+const norm = (p: string) => p.replace(/\/$/, '') || '/';
+const path = norm(Astro.url.pathname);
+const isActive = (href: string) => {
+  const h = norm(withBase(href));
+  return path === h || path.startsWith(h + '/');
+};
 ---
 <header class="nav">
   <div class="wrap nav-in">
-    <a class="brand" href="/">
+    <a class="brand" href={withBase('/')}>
       <Logo class="glyph" />
       <span class="brand-txt">{SITE.name}<small>{SITE.sub}</small></span>
     </a>
@@ -19,7 +24,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
     <nav class="links" data-menu aria-label="Primary">
       {NAV.map((item) => (
-        <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+        <a href={withBase(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
       ))}
       <a class="cta" href={MAILING_LIST_URL} target="_blank" rel="noopener">Join the list</a>
     </nav>
