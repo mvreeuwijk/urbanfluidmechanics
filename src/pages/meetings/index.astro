@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { getMeetings, formatMeetingDate, talkCount } from '../../data/meetings';
 import { withBase } from '../../lib/url';
-import meetingsBanner from '../../assets/images/hero-meetings.jpg';
+import meetingsBanner from '../../assets/images/UFMreading.png';
 const meetings = await getMeetings();
 ---
 <Base title="Meetings" description="Archive of Urban Fluid Mechanics meetings and their presentations, 2017 onwards.">
@@ -12,7 +12,7 @@ const meetings = await getMeetings();
     title="Meetings & presentations"
     lead="The group meets once or twice a year — typically around 50 participants across universities, industry and government. Talks and slides from each meeting are archived here as a lasting record of the field."
     image={meetingsBanner}
-    imageAlt="Streaklines of a flow field converging toward a single focal point"
+    imageAlt="Group photo of participants at a UFM meeting"
   />
   <section class="section">
     <div class="wrap">

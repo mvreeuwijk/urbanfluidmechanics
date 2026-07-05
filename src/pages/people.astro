@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Avatar from '../components/Avatar.astro';
 import { LEADS, STEERING, FORMER } from '../data/organisation';
+import peopleBanner from '../assets/images/UFM_Brimingham.jpg';
 
 const groups = [
   { title: 'Leads', note: 'The community is led by three co-chairs.', people: LEADS },
@@ -15,6 +16,8 @@ const groups = [
     eyebrow="Organisation"
     title="People"
     lead="The community is led by three co-chairs and guided by a steering committee drawn from academia, industry and government. We gratefully acknowledge their work — and that of our former committee members."
+    image={peopleBanner}
+    imageAlt="Group photo of the UFM community at a meeting"
   />
   <section class="section">
     <div class="wrap">
