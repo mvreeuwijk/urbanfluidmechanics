@@ -4,7 +4,7 @@ import PageHeader from '../components/PageHeader.astro';
 import { MEMBERS, MEMBER_COUNT } from '../data/members';
 import type { MemberKind } from '../data/members';
 import { CONTACTS, MAILING_LIST_URL } from '../consts';
-import membersBanner from '../assets/images/UFMreading.png';
+import membersBanner from '../assets/images/hero-members.jpg';
 
 const groups: { key: MemberKind; title: string; short: string; blurb: string }[] = [
   { key: 'academic', title: 'Universities & research institutes', short: 'Academia', blurb: 'Fundamental to applied — experimental, numerical and theoretical.' },
@@ -32,7 +32,7 @@ const lead = `An open community with no membership fee — spanning universities
     title="Members"
     lead={lead}
     image={membersBanner}
-    imageAlt="Group photo of the UFM community at a meeting"
+    imageAlt="A constellation of connected nodes representing member institutions worldwide"
   />
 
   <!-- stats band -->
