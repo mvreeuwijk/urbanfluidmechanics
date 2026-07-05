@@ -27,3 +27,9 @@ npm-debug.log*
 # heavy original banner downloads (optimized copies live in src/assets/images)
 /public/images/
 *-b64.json
+
+# browser-eval / scraping scratch artifacts
+chosen-photos*.json
+meeting-images.json
+contact-datauri.txt
+contact*.jpg
