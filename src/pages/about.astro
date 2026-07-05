@@ -1,8 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
-import { CONTACTS, MAILING_LIST_URL } from '../consts';
+import { MAILING_LIST_URL } from '../consts';
 import { withBase } from '../lib/url';
+import { LEADS, STEERING, FORMER } from '../data/organisation';
 import aboutBanner from '../assets/images/hero-about.jpg';
 
 // Curated external resources (from the current site's "Other Resources").
@@ -46,13 +47,50 @@ const resources = [
         The <a href={withBase('/data-portal')}>Data Portal</a> collects datasets from field, laboratory and CFD studies so
         they can be found, compared and reused.</p>
 
-      <h2>Organisers &amp; contact</h2>
-      <p>For anything about the group, please contact:</p>
-      <ul class="contacts">
-        {CONTACTS.map((c) => (
-          <li><a href={`mailto:${c.email}`}>{c.name}</a> · {c.institution}</li>
-        ))}
-      </ul>
+      <h2 id="organisation">Steering committee</h2>
+      <p>The group is led by three co-chairs and guided by a steering committee drawn from academia,
+        industry and government. We gratefully acknowledge their work — and that of our former committee
+        members — in building and sustaining the community.</p>
+
+      <div class="org-group">
+        <h3>Leads</h3>
+        <ul class="people">
+          {LEADS.map((p) => (
+            <li>
+              <span class="p-name">{p.url ? <a href={p.url} target="_blank" rel="noopener">{p.name}</a> : p.name}</span>
+              <span class="p-inst">{p.institution}{p.email && <> · <a href={`mailto:${p.email}`}>email</a></>}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="org-group">
+        <h3>Steering committee</h3>
+        <ul class="people">
+          {STEERING.map((p) => (
+            <li>
+              <span class="p-name">{p.url ? <a href={p.url} target="_blank" rel="noopener">{p.name}</a> : p.name}</span>
+              <span class="p-inst">{p.institution}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="org-group">
+        <h3>Former committee members</h3>
+        <ul class="people former">
+          {FORMER.map((p) => (
+            <li>
+              <span class="p-name">{p.url ? <a href={p.url} target="_blank" rel="noopener">{p.name}</a> : p.name}</span>
+              <span class="p-inst">{p.institution}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <h2>Get in touch</h2>
+      <p>For anything about the group, contact one of the leads above, or
+        <a href={MAILING_LIST_URL} target="_blank" rel="noopener">join the mailing list</a>.</p>
 
       <h2>Other resources</h2>
       <ul class="resources">
@@ -69,6 +107,16 @@ const resources = [
   .prose h2 { font-size: 22px; margin: 34px 0 12px; }
   .prose h2:first-child { margin-top: 0; }
   .prose p { color: var(--sub); margin-bottom: 14px; }
-  .contacts, .resources { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; color: var(--sub); }
+  .resources { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; color: var(--sub); }
   .resources span { color: var(--faint); }
+  .org-group { margin: 6px 0 20px; }
+  .org-group h3 { font-family: var(--sans); font-size: 12.5px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--faint); font-weight: 700; margin: 0 0 10px; }
+  .people { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px 22px; margin: 0; padding: 0; list-style: none; }
+  .people li { display: flex; flex-direction: column; gap: 1px; }
+  .p-name { font-weight: 600; }
+  .p-name a { color: var(--ink); }
+  .p-name a:hover { color: var(--teal); }
+  .people.former .p-name { font-weight: 500; }
+  .p-inst { font-size: 13px; color: var(--sub); }
 </style>
