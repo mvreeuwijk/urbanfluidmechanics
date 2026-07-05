@@ -1,42 +1,119 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
-import { MEMBERS } from '../data/members';
+import { MEMBERS, MEMBER_COUNT } from '../data/members';
+import type { MemberKind } from '../data/members';
 import { CONTACTS, MAILING_LIST_URL } from '../consts';
+import membersBanner from '../assets/images/hero-members.jpg';
 
-const groups: { key: 'academic' | 'industry' | 'government'; title: string }[] = [
-  { key: 'academic', title: 'Universities & research institutes' },
-  { key: 'industry', title: 'Industry & consultancy' },
-  { key: 'government', title: 'Government & national laboratories' },
+const groups: { key: MemberKind; title: string; short: string; blurb: string }[] = [
+  { key: 'academic', title: 'Universities & research institutes', short: 'Academia', blurb: 'Fundamental to applied — experimental, numerical and theoretical.' },
+  { key: 'industry', title: 'Industry & consultancy', short: 'Industry', blurb: 'Engineering, environmental and CFD practice.' },
+  { key: 'government', title: 'Government & national laboratories', short: 'Government', blurb: 'Weather, defence, health and safety agencies.' },
 ];
-const byKind = (k: string) => MEMBERS.filter((m) => m.kind === k).sort((a, b) => a.name.localeCompare(b.name));
+
+const byKind = (k: MemberKind) => MEMBERS.filter((m) => m.kind === k).sort((a, b) => a.name.localeCompare(b.name));
+
+const institutions = MEMBERS.length;
+const countries = new Set(MEMBERS.map((m) => m.country)).size;
+
+const stats = [
+  { value: MEMBER_COUNT.toString(), label: 'members' },
+  { value: institutions.toString(), label: 'institutions' },
+  { value: countries.toString(), label: 'countries' },
+];
+
+const lead = `An open community with no membership fee — spanning universities, industry and government ` +
+  `from the UK to the wider world. Affiliations are drawn from our mailing list; browse or search below.`;
 ---
-<Base title="Members" description="More than 250 members from over 40 universities, companies and government organisations.">
+<Base title="Members" description={`${MEMBER_COUNT} members across ${institutions} institutions in ${countries} countries.`}>
   <PageHeader
     eyebrow="Community"
     title="Members"
-    lead="More than 250 members from over 40 universities, companies and governmental organisations across the UK and beyond. The group is open — there is no membership fee."
+    lead={lead}
+    image={membersBanner}
+    imageAlt="A constellation of connected nodes representing member institutions worldwide"
   />
-  <section class="section">
-    <div class="wrap">
-      {groups.map((g) => (
-        <div class="group">
-          <h2 class="group-title">{g.title}</h2>
-          <ul class="grid">
-            {byKind(g.key).map((m) => (
-              <li><a href={m.url} target="_blank" rel="noopener">{m.name}</a></li>
-            ))}
-          </ul>
+
+  <!-- stats band -->
+  <section class="stats-band">
+    <div class="wrap stats-row">
+      {stats.map((s) => (
+        <div class="stat">
+          <div class="stat-num mono">{s.value}</div>
+          <div class="stat-label">{s.label}</div>
         </div>
       ))}
+    </div>
+  </section>
 
+  <section class="section">
+    <div class="wrap">
+      <!-- controls: search + sector filters (which double as a colour legend) -->
+      <div class="controls">
+        <div class="search">
+          <svg class="search-ic" viewBox="0 0 20 20" aria-hidden="true" width="16" height="16">
+            <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+            <line x1="12.6" y1="12.6" x2="17" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+          <input id="q" type="search" placeholder="Search institution or country…" autocomplete="off"
+            aria-label="Search members by institution or country" />
+        </div>
+        <div class="filters" role="group" aria-label="Filter by sector">
+          <button class="pill is-active" data-filter="all">All <span class="ct">{MEMBERS.length}</span></button>
+          {groups.map((g) => (
+            <button class={`pill k-${g.key}`} data-filter={g.key}>
+              <span class="dot"></span>{g.short}
+              <span class="ct">{byKind(g.key).length}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p class="tally" id="tally" aria-live="polite"></p>
+
+      <!-- directory -->
+      <div id="directory">
+        {groups.map((g) => (
+          <section class={`group k-${g.key}`} data-group={g.key}>
+            <div class="group-head">
+              <h2 class="group-title">{g.title}</h2>
+              <p class="group-blurb">{g.blurb}</p>
+            </div>
+            <ul class="grid">
+              {byKind(g.key).map((m) => (
+                <li class="plate" data-name={m.name.toLowerCase()} data-country={m.country.toLowerCase()}>
+                  {m.url ? (
+                    <a href={m.url} target="_blank" rel="noopener" class="p-name">{m.name}
+                      <svg class="ext" viewBox="0 0 12 12" aria-hidden="true" width="11" height="11">
+                        <path d="M4 2h6v6M10 2 3 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <span class="p-name">{m.name}</span>
+                  )}
+                  <span class="p-country mono">{m.country}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+        <p class="empty" id="empty" hidden>No institutions match “<span id="empty-q"></span>”. <button id="clear" class="linkish">Clear search</button></p>
+      </div>
+
+      <!-- get involved -->
       <div class="join card">
-        <h2>Get involved</h2>
-        <p>If you would like to join the community, <a href={MAILING_LIST_URL} target="_blank" rel="noopener">sign up
-          to the mailing list</a> or get in touch with one of the organisers:</p>
+        <div>
+          <h2>Get involved</h2>
+          <p>The group is open and there is no membership fee. <a href={MAILING_LIST_URL} target="_blank" rel="noopener">Sign up
+            to the mailing list</a>, or reach one of the organisers directly.</p>
+        </div>
         <ul class="contacts">
           {CONTACTS.map((c) => (
-            <li><a href={`mailto:${c.email}`}>{c.name}</a> · {c.institution}</li>
+            <li>
+              <a href={`mailto:${c.email}`}>{c.name}</a>
+              <span class="c-inst">{c.institution}</span>
+            </li>
           ))}
         </ul>
       </div>
@@ -44,15 +121,137 @@ const byKind = (k: string) => MEMBERS.filter((m) => m.kind === k).sort((a, b) =>
   </section>
 </Base>
 
+<script>
+  const q = document.getElementById('q') as HTMLInputElement;
+  const tally = document.getElementById('tally')!;
+  const empty = document.getElementById('empty')!;
+  const emptyQ = document.getElementById('empty-q')!;
+  const clearBtn = document.getElementById('clear')!;
+  const pills = Array.from(document.querySelectorAll<HTMLButtonElement>('.pill'));
+  const groups = Array.from(document.querySelectorAll<HTMLElement>('.group'));
+  const plates = Array.from(document.querySelectorAll<HTMLElement>('.plate'));
+  const total = plates.length;
+  let sector = 'all';
+
+  function apply() {
+    const term = q.value.trim().toLowerCase();
+    let shown = 0;
+    for (const p of plates) {
+      const inSector = sector === 'all' || p.closest('.group')?.getAttribute('data-group') === sector;
+      const inSearch = !term
+        || p.dataset.name!.includes(term)
+        || p.dataset.country!.includes(term);
+      const vis = inSector && inSearch;
+      p.hidden = !vis;
+      if (vis) shown++;
+    }
+    for (const g of groups) {
+      const visible = g.querySelectorAll<HTMLElement>('.plate:not([hidden])').length;
+      g.hidden = visible === 0;
+    }
+    empty.hidden = shown > 0;
+    emptyQ.textContent = term;
+    tally.textContent = shown === total ? `${total} institutions` : `${shown} of ${total} institutions`;
+  }
+
+  pills.forEach((pill) => pill.addEventListener('click', () => {
+    sector = pill.dataset.filter!;
+    pills.forEach((p) => p.classList.toggle('is-active', p === pill));
+    apply();
+  }));
+  q.addEventListener('input', apply);
+  clearBtn.addEventListener('click', () => {
+    q.value = ''; sector = 'all';
+    pills.forEach((p) => p.classList.toggle('is-active', p.dataset.filter === 'all'));
+    apply(); q.focus();
+  });
+  apply();
+</script>
+
 <style>
-  .group { margin-bottom: 40px; }
-  .group-title { font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint);
-    font-family: var(--sans); font-weight: 700; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
-  .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 24px; }
-  .grid a { color: var(--ink); font-size: 15px; }
-  .grid a:hover { color: var(--teal); }
-  .join { margin-top: 8px; }
-  .join h2 { font-size: 20px; margin-bottom: 10px; }
-  .join p { color: var(--sub); max-width: 66ch; }
-  .contacts { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14.5px; color: var(--sub); }
+  /* sector accent colours */
+  .k-academic   { --accent: var(--teal); }
+  .k-industry   { --accent: var(--sand); }
+  .k-government { --accent: var(--green); }
+
+  /* ---- stats band ---- */
+  .stats-band { background: var(--paper); border-bottom: 1px solid var(--line); }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .stat { padding: 24px 8px 26px; text-align: center; border-left: 1px solid var(--line); }
+  .stat:first-child { border-left: none; }
+  .stat-num { font-size: clamp(30px, 5vw, 46px); font-weight: 600; color: var(--ink); line-height: 1;
+    letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .stat-label { margin-top: 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--faint); }
+
+  /* ---- controls ---- */
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px;
+    flex-wrap: wrap; margin-bottom: 14px; }
+  .search { position: relative; flex: 1 1 260px; max-width: 360px; }
+  .search-ic { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--faint); pointer-events: none; }
+  #q { width: 100%; padding: 11px 14px 11px 38px; font: inherit; font-size: 15px; color: var(--ink);
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px; transition: border-color .15s, box-shadow .15s; }
+  #q::placeholder { color: var(--faint); }
+  #q:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 18%, transparent); }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; font: inherit;
+    font-size: 13.5px; font-weight: 600; color: var(--sub); background: var(--card);
+    border: 1px solid var(--line); border-radius: 999px; cursor: pointer; transition: color .15s, background .15s, border-color .15s; }
+  .pill:hover { border-color: var(--accent, var(--teal)); color: var(--ink); }
+  .pill .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+  .pill .ct { font-family: var(--mono); font-size: 11.5px; color: var(--faint); font-weight: 400; }
+  .pill.is-active { color: #fff; border-color: transparent; background: var(--accent, var(--teal-deep)); }
+  .pill[data-filter="all"].is-active { background: var(--ink); }
+  .pill.is-active .ct { color: rgba(255,255,255,.72); }
+  .pill.is-active .dot { background: #fff; }
+
+  .tally { font-family: var(--mono); font-size: 12.5px; color: var(--faint); letter-spacing: .02em;
+    margin-bottom: 30px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); }
+
+  /* ---- groups ---- */
+  .group { margin-bottom: 44px; }
+  .group[hidden] { display: none; }
+  .group-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .group-title { position: relative; font-size: clamp(18px, 2.4vw, 22px); padding-left: 16px; }
+  .group-title::before { content: ""; position: absolute; left: 0; top: .18em; bottom: .12em; width: 4px;
+    border-radius: 4px; background: var(--accent); }
+  .group-blurb { color: var(--faint); font-size: 14px; }
+
+  /* ---- plate grid ---- */
+  .grid { list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; }
+  .plate { position: relative; padding: 14px 15px 13px; background: var(--card);
+    border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px;
+    display: flex; flex-direction: column; gap: 4px; transition: transform .14s, box-shadow .14s; }
+  .plate[hidden] { display: none; }
+  .plate:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .p-name { font-family: var(--serif); font-size: 15.5px; font-weight: 600; color: var(--ink);
+    line-height: 1.28; letter-spacing: -.005em; display: inline-flex; align-items: flex-start; gap: 5px; }
+  a.p-name:hover { color: var(--accent); text-decoration: none; }
+  .ext { flex: none; margin-top: 3px; opacity: 0; color: var(--accent); transition: opacity .14s; }
+  .plate:hover .ext { opacity: .8; }
+  .p-country { font-size: 11.5px; color: var(--faint); letter-spacing: .01em; }
+
+  .empty { color: var(--sub); font-size: 15px; padding: 12px 0; }
+  .empty[hidden] { display: none; }
+  .linkish { font: inherit; font-weight: 700; color: var(--teal); background: none; border: none; padding: 0; cursor: pointer; }
+  .linkish:hover { text-decoration: underline; }
+
+  /* ---- get involved ---- */
+  .join { margin-top: 20px; display: grid; grid-template-columns: 1fr auto; gap: 28px 48px; align-items: center; }
+  .join h2 { font-size: 21px; margin-bottom: 8px; }
+  .join p { color: var(--sub); max-width: 52ch; }
+  .contacts { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .contacts li { display: flex; flex-direction: column; font-size: 14.5px; }
+  .contacts a { font-weight: 700; color: var(--ink); }
+  .contacts a:hover { color: var(--teal); text-decoration: none; }
+  .c-inst { color: var(--faint); font-size: 12.5px; }
+
+  @media (max-width: 680px) {
+    .stat { padding-inline: 4px; }
+    .join { grid-template-columns: 1fr; }
+    .controls { flex-direction: column; align-items: stretch; }
+    .search { max-width: none; }
+  }
 </style>

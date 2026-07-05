@@ -2,13 +2,15 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { CHALLENGES } from '../data/challenges';
-import { MEETINGS, meetingsByDateDesc, formatMeetingDate } from '../data/meetings';
+import { getMeetings, formatMeetingDate, talkCount } from '../data/meetings';
+import { MEMBERS, MEMBER_COUNT } from '../data/members';
 import { MAILING_LIST_URL } from '../consts';
 import { withBase } from '../lib/url';
 import heroImg from '../assets/images/wind-tunnel-model.jpg';
 
-const recentMeetings = meetingsByDateDesc.slice(0, 3);
-const meetingCount = MEETINGS.length;
+const meetings = await getMeetings();
+const recentMeetings = meetings.slice(0, 3);
+const meetingCount = meetings.length;
 
 // Small illustrative teaser for the portal preview (full data lives on /data-portal).
 const teaser = [
@@ -40,8 +42,8 @@ const teaser = [
 
   <!-- ============ STATS ============ -->
   <div class="statbar"><div class="wrap">
-    <div class="stat"><b>250+</b><span>Members</span></div>
-    <div class="stat"><b>40+</b><span>Institutions &amp; companies</span></div>
+    <div class="stat"><b>{MEMBER_COUNT}</b><span>Members</span></div>
+    <div class="stat"><b>{MEMBERS.length}</b><span>Institutions &amp; companies</span></div>
     <div class="stat"><b>{meetingCount}</b><span>Meetings since 2017</span></div>
   </div></div>
 
@@ -121,12 +123,12 @@ const teaser = [
       </div>
       <div class="mgrid">
         {recentMeetings.map((m) => (
-          <a class="mcard" href={withBase(`/meetings/${m.slug}`)}>
-            <div class="mdate mono">{formatMeetingDate(m)}</div>
-            <h3>{m.label}</h3>
-            <div class="mloc">{m.host}</div>
+          <a class="mcard" href={withBase(`/meetings/${m.id}`)}>
+            <div class="mdate mono">{formatMeetingDate(m.data.start, m.data.end)}</div>
+            <h3>{m.data.label}</h3>
+            <div class="mloc">{m.data.host}</div>
             <div class="mfoot">
-              {m.talksCount ? <span class="talks">{m.talksCount} talks</span> : <span></span>}
+              {talkCount(m) ? <span class="talks">{talkCount(m)} talks</span> : <span></span>}
               <span class="go">Programme &amp; slides →</span>
             </div>
           </a>

@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import { CONTACTS, MAILING_LIST_URL } from '../consts';
 import { withBase } from '../lib/url';
+import aboutBanner from '../assets/images/hero-about.jpg';
 
 // Curated external resources (from the current site's "Other Resources").
 const resources = [
@@ -16,6 +17,9 @@ const resources = [
   <PageHeader
     eyebrow="About the group"
     title="An independent, open community"
+    lead="Founded in 2017 within the UK Fluids Network, the group brings together researchers and practitioners working on the fluid mechanics of the urban environment — across academia, industry and government."
+    image={aboutBanner}
+    imageAlt="The urban atmospheric boundary layer — wind-shear streaks above a city skyline"
   />
   <section class="section">
     <div class="wrap prose">

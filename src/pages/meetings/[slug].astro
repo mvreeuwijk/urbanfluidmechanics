@@ -1,49 +1,70 @@
 ---
+import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import { MEETINGS, formatMeetingDate, type Meeting } from '../../data/meetings';
+import { formatMeetingDate, type MeetingEntry } from '../../data/meetings';
 import { withBase } from '../../lib/url';
 
-export function getStaticPaths() {
-  return MEETINGS.map((m) => ({ params: { slug: m.slug }, props: { meeting: m } }));
+export async function getStaticPaths() {
+  const meetings = await getCollection('meetings');
+  return meetings.map((m) => ({ params: { slug: m.id }, props: { meeting: m } }));
 }
-const { meeting } = Astro.props as { meeting: Meeting };
-// Full programmes/slides currently live on the archived Google Sites pages.
-const archivedUrl = `https://www.urbanfluidmechanics.org/meetings/${meeting.slug}`;
+const { meeting } = Astro.props as { meeting: MeetingEntry };
+const { data } = meeting;
+const { Content } = await render(meeting);
+const hasTimes = data.programme.some((p) => p.time);
 ---
-<Base title={meeting.label} description={`${meeting.label} — ${formatMeetingDate(meeting)}, ${meeting.host}.`}>
-  <PageHeader eyebrow="Meeting" title={meeting.label}>
+<Base title={data.label} description={`${data.label} — ${formatMeetingDate(data.start, data.end)}, ${data.host}.`}>
+  <PageHeader eyebrow={data.theme ?? 'Meeting'} title={data.label}>
     <p class="meta">
-      <span class="mono">{formatMeetingDate(meeting)}</span>
-      <span class="dot">·</span> {meeting.host}
-      <span class="dot">·</span> {meeting.location}
-      {meeting.online && <span class="badge">Online</span>}
+      <span class="mono">{formatMeetingDate(data.start, data.end)}</span>
+      <span class="dot">·</span> {data.host}
+      <span class="dot">·</span> {data.location}
+      {data.online && <span class="badge">Online</span>}
     </p>
+    {data.venue && <p class="venue">{data.venue}</p>}
+    {data.registrationUrl && (
+      <p style="margin-top:14px"><a class="btn primary" href={data.registrationUrl} target="_blank" rel="noopener">Register →</a></p>
+    )}
   </PageHeader>
 
   <section class="section">
     <div class="wrap prose">
-      {meeting.talks && meeting.talks.length > 0 ? (
+      <Content />
+
+      {data.programme.length > 0 ? (
         <>
           <h2>Programme</h2>
-          <ol class="talks">
-            {meeting.talks.map((t) => (
-              <li>
-                <span class="t-title">{t.slidesUrl ? <a href={t.slidesUrl} target="_blank" rel="noopener">{t.title}</a> : t.title}</span>
-                {(t.speaker || t.affiliation) && (
-                  <span class="t-speaker">{t.speaker}{t.affiliation ? ` · ${t.affiliation}` : ''}</span>
-                )}
-              </li>
+          <div class={`programme ${hasTimes ? 'timed' : ''}`}>
+            {data.programme.map((p) => (
+              p.header ? (
+                <h3 class="prog-header">{p.session}</h3>
+              ) : (
+                <div class={`prog-row ${p.title ? 'is-talk' : 'is-note'}`}>
+                  <div class="prog-time mono">{p.time}</div>
+                  <div class="prog-body">
+                    {p.title ? (
+                      <>
+                        <div class="t-title">
+                          {p.slides ? <a href={p.slides} target="_blank" rel="noopener">{p.title}</a> : p.title}
+                          {p.keynote && <span class="kbadge">Keynote</span>}
+                          {p.slides && <span class="slides-tag">slides ↗</span>}
+                        </div>
+                        {(p.speaker || p.affiliation) && (
+                          <div class="t-speaker">{p.speaker}{p.affiliation ? ` · ${p.affiliation}` : ''}</div>
+                        )}
+                      </>
+                    ) : (
+                      <div class="prog-note">{p.note}</div>
+                    )}
+                  </div>
+                </div>
+              )
             ))}
-          </ol>
+          </div>
         </>
       ) : (
-        <div class="notice card">
-          <h2>Programme &amp; slides</h2>
-          <p>The full programme and presentation slides for this meeting are currently hosted on the archived
-            site. We are migrating them here; in the meantime you can view them at the original page:</p>
-          <p><a class="btn primary" href={archivedUrl} target="_blank" rel="noopener">Open the archived meeting page →</a></p>
-        </div>
+        <p class="muted">The programme for this meeting has not been published yet.</p>
       )}
 
       <p class="back"><a class="link-arrow" href={withBase('/meetings')}>← All meetings</a></p>
@@ -54,16 +75,32 @@ const archivedUrl = `https://www.urbanfluidmechanics.org/meetings/${meeting.slug
 <style>
   .meta { margin-top: 14px; color: var(--sub); font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .dot { color: var(--faint); }
+  .venue { margin-top: 6px; color: var(--sub); font-size: 14px; }
   .badge { font-family: var(--sans); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
     color: var(--teal-deep); background: var(--teal-soft); padding: 2px 8px; border-radius: 20px; }
-  .prose { max-width: 74ch; }
-  .prose h2 { font-size: 22px; margin-bottom: 14px; }
-  .talks { padding-left: 0; list-style: none; counter-reset: t; display: flex; flex-direction: column; gap: 14px; }
-  .talks li { counter-increment: t; padding-left: 40px; position: relative; }
-  .talks li::before { content: counter(t); position: absolute; left: 0; top: 0; font-family: var(--mono); font-size: 13px;
-    font-weight: 700; color: var(--faint); }
-  .t-title { display: block; font-weight: 600; }
-  .t-speaker { display: block; font-size: 13.5px; color: var(--sub); margin-top: 2px; }
-  .notice p { color: var(--sub); margin-bottom: 14px; }
+  .prose { max-width: 76ch; }
+  .prose :global(p) { color: var(--sub); margin-bottom: 16px; }
+  .prose h2 { font-size: 22px; margin: 28px 0 18px; }
+
+  .prog-header { font-size: 14px; font-family: var(--sans); font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--faint); padding-bottom: 8px; border-bottom: 1px solid var(--line);
+    margin: 26px 0 8px; }
+  .prog-header:first-child { margin-top: 0; }
+
+  .prog-row { display: grid; grid-template-columns: 62px 1fr; gap: 4px 16px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .programme:not(.timed) .prog-row { grid-template-columns: 1fr; }
+  .programme:not(.timed) .prog-time { display: none; }
+  .prog-time { font-size: 13px; color: var(--faint); font-weight: 700; padding-top: 1px; font-variant-numeric: tabular-nums; }
+  .t-title { font-weight: 600; }
+  .t-title a { color: var(--ink); }
+  .t-title a:hover { color: var(--teal); }
+  .t-speaker { font-size: 13.5px; color: var(--sub); margin-top: 2px; }
+  .prog-note { color: var(--sub); font-style: italic; }
+  .is-note .prog-time { color: var(--faint); }
+  .kbadge { display: inline-block; margin-left: 8px; font-family: var(--sans); font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em; color: var(--sand); background: var(--sand-soft);
+    padding: 1px 7px; border-radius: 20px; vertical-align: middle; }
+  .slides-tag { margin-left: 8px; font-size: 11px; font-weight: 700; color: var(--teal); white-space: nowrap; }
+  .muted { color: var(--faint); }
   .back { margin-top: 30px; }
 </style>

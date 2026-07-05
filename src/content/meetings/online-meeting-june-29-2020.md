@@ -1,0 +1,60 @@
+---
+number: 7
+label: "7th UFM Meeting"
+theme: "Short-range dispersion & virus transmission"
+start: 2020-06-29
+host: "Online (Southampton-hosted)"
+location: "Online"
+venue: "Online (MS Teams); hosted by University of Southampton"
+online: true
+programme:
+  - time: "1100-1105"
+    note: "Opening remarks (Zheng-Tong Xie, University of Southampton)"
+    slides: "https://drive.google.com/file/d/1-Y09vPnVPUJYE_452O4iel7bv8uggR5V/view?usp=sharing"
+  - time: "1105-1200"
+    title: "Keynote: Adapting the built environment for disease control: challenges and opportunities"
+    speaker: "Catherine Noakes"
+    affiliation: "University of Leeds"
+    slides: "https://drive.google.com/file/d/1AijK02wlek0j86O5tx-23koC1kh4s2wH/view?usp=sharing"
+    keynote: true
+  - header: true
+    session: "Invited Lectures Session (Chair: Andrew Quinn, University of Birmingham) — 1200-1320"
+  - title: "Sharing research of coping with the COVID-19 pandemic"
+    speaker: "Yuguo Li"
+    affiliation: "University of Hong Kong"
+    slides: "https://drive.google.com/file/d/18Qsk-MfDdDYnrq7HjQjSal2dpIQlMKVc/view?usp=sharing"
+  - title: "Applying a high-resolution dispersion model in London to estimate changes in pollutant emissions during the COVID-19 lockdown"
+    speaker: "David Carruthers"
+    affiliation: "CERC"
+    slides: "https://drive.google.com/file/d/17pfVdv68oFoFwKfzOAeESoUNk3juBBUS/view?usp=sharing"
+  - title: "An analytical approach to urban dispersion modelling"
+    speaker: "Omduth Coceal"
+    affiliation: "University of Reading"
+    slides: "https://drive.google.com/file/d/177v8wRc6oxt0AesNQ1_T2l-SPByenXP_/view?usp=sharing"
+  - title: "Modelling short-range dispersion: present and future"
+    speaker: "Asiri Obeysekara & Jefferson Luis"
+    affiliation: "Imperial College / University of Aberdeen"
+    slides: "https://drive.google.com/file/d/1vORLFlsY52112Kyb5aIspyDOiK1bb1BW/view?usp=sharing"
+  - time: "1320-1400"
+    note: "Lunch break"
+  - header: true
+    session: "Invited Lectures Session (Chair: Gabriel Rooney, Met Office) — 1400-1500"
+  - title: "Aerosol transport: an update from RAMP (Rapid Assistance in Modelling the Pandemic)"
+    speaker: "Paul Linden"
+    affiliation: "University of Cambridge"
+    slides: "https://drive.google.com/file/d/1kQ1HkbFXB3ypqstBmggWx-SDwYVubuv-/view?usp=sharing"
+  - title: "Simple solutions for the concentration fluctuations of a passive scalar"
+    speaker: "Pietro Salizzoni"
+    affiliation: "Ecole Central"
+    slides: "https://drive.google.com/file/d/1LZ88Tcr0Lvm22ZynHpSmSmHhqvdZRb8b/view?usp=sharing"
+  - title: "Everything we do not know about the flow physics of COVID-19 transmission"
+    speaker: "Rajat Mittal"
+    affiliation: "Johns Hopkins University"
+    slides: "https://drive.google.com/file/d/1c_3LlY_mFxqQJlT0sDy-icZGBwqDbAom/view?usp=sharing"
+  - time: "1500-1600"
+    note: "Panel discussion on transmission of virus in urban environments (Moderator: Maarten van Reeuwijk; Panel: Catherine Noakes, Paul Linden, Yuguo Li, Rajat Mittal)"
+  - time: "1600"
+    note: "Wrap up and next network meeting (Maarten van Reeuwijk)"
+---
+
+An online workshop, held early in the COVID-19 pandemic, on short-range dispersion in urban environments and its role in virus transmission.

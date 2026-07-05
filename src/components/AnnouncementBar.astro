@@ -1,19 +1,19 @@
 ---
-import { featuredMeeting, formatMeetingDate } from '../data/meetings';
+import { getMeetings, featuredMeeting, formatMeetingDate } from '../data/meetings';
 import { withBase } from '../lib/url';
 
 // Computed at build time. Shows the NEXT upcoming meeting, or falls back to the
 // LAST meeting once it has passed. Hidden entirely if there are no meetings.
-const featured = featuredMeeting(new Date());
+const featured = featuredMeeting(await getMeetings(), new Date());
 ---
 {featured && (
   <div class="announce" id="announce">
     <div class="wrap ann-in">
       <span class="ann-tag">{featured.kind === 'next' ? 'Next meeting' : 'Last meeting'}</span>
       <span class="txt">
-        {featured.meeting.label} · {formatMeetingDate(featured.meeting)} · {featured.meeting.host}
+        {featured.meeting.data.label} · {formatMeetingDate(featured.meeting.data.start, featured.meeting.data.end)} · {featured.meeting.data.host}
       </span>
-      <a href={withBase(`/meetings/${featured.meeting.slug}`)}>
+      <a href={withBase(`/meetings/${featured.meeting.id}`)}>
         {featured.kind === 'next' ? 'See the programme →' : 'View slides →'}
       </a>
       <button class="ann-x" type="button" aria-label="Dismiss announcement" data-dismiss>×</button>

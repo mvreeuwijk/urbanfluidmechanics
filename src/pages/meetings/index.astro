@@ -1,27 +1,31 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import { meetingsByDateDesc, formatMeetingDate } from '../../data/meetings';
+import { getMeetings, formatMeetingDate, talkCount } from '../../data/meetings';
 import { withBase } from '../../lib/url';
+import meetingsBanner from '../../assets/images/hero-meetings.jpg';
+const meetings = await getMeetings();
 ---
 <Base title="Meetings" description="Archive of Urban Fluid Mechanics meetings and their presentations, 2017 onwards.">
   <PageHeader
     eyebrow="Community & outputs"
     title="Meetings & presentations"
     lead="The group meets once or twice a year — typically around 50 participants across universities, industry and government. Talks and slides from each meeting are archived here as a lasting record of the field."
+    image={meetingsBanner}
+    imageAlt="Streaklines of a flow field converging toward a single focal point"
   />
   <section class="section">
     <div class="wrap">
       <ol class="meetings">
-        {meetingsByDateDesc.map((m) => (
+        {meetings.map((m) => (
           <li>
-            <a class="mrow" href={withBase(`/meetings/${m.slug}`)}>
-              <span class="date mono">{formatMeetingDate(m)}</span>
+            <a class="mrow" href={withBase(`/meetings/${m.id}`)}>
+              <span class="date mono">{formatMeetingDate(m.data.start, m.data.end)}</span>
               <span class="main">
-                <span class="label">{m.label}{m.online && <span class="badge">Online</span>}</span>
-                <span class="host">{m.host} · {m.location}</span>
+                <span class="label">{m.data.label}{m.data.online && <span class="badge">Online</span>}</span>
+                <span class="host">{m.data.host} · {m.data.location}</span>
               </span>
-              {m.talksCount ? <span class="talks">{m.talksCount} talks</span> : <span></span>}
+              {talkCount(m) ? <span class="talks">{talkCount(m)} talks</span> : <span></span>}
               <span class="go" aria-hidden="true">→</span>
             </a>
           </li>
