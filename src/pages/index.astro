@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import { CHALLENGES } from '../data/challenges';
 import { getMeetings, formatMeetingDate, talkCount } from '../data/meetings';
 import { MEMBERS, MEMBER_COUNT } from '../data/members';
+import { datasets, primaryType, TYPE_LABEL, facet } from '../lib/datasets';
 import { MAILING_LIST_URL } from '../consts';
 import { withBase } from '../lib/url';
 import heroImg from '../assets/images/wind-tunnel-model.jpg';
@@ -12,14 +13,24 @@ const meetings = await getMeetings();
 const recentMeetings = meetings.slice(0, 3);
 const meetingCount = meetings.length;
 
-// Small illustrative teaser for the portal preview (full data lives on /data-portal).
-const teaser = [
-  { name: 'ACTUAL — Urban Atmospheric Laboratory', method: 'field', tag: 'Field', city: 'London' },
-  { name: 'Character of rough-wall BLs', method: 'lab', tag: 'Lab', city: 'Southampton' },
-  { name: 'CWE2000 cube (Silsoe)', method: 'cfd', tag: 'CFD', city: 'Silsoe' },
-  { name: 'ClearfLo air-pollution campaign', method: 'field', tag: 'Field', city: 'London' },
-  { name: 'CUBE — idealised building PIV', method: 'lab', tag: 'Lab', city: 'London' },
-];
+// Portal preview — driven by the real dataset records (full data lives on /data-portal).
+const methodOrder = ['field', 'lab', 'cfd'] as const;
+const methodCounts = { field: 0, lab: 0, cfd: 0 };
+datasets.forEach((d) => methodCounts[primaryType(d)]++);
+const maxMethod = Math.max(...Object.values(methodCounts));
+
+const nCities = new Set(datasets.map((d) => d.city)).size;
+const nCountries = new Set(datasets.map((d) => d.country)).size;
+const nInstitutions = facet('institution').length;
+
+const qCount: Record<string, number> = {};
+datasets.forEach((d) => d.quantities.forEach((q) => (qCount[q] = (qCount[q] || 0) + 1)));
+const topQuantities = Object.entries(qCount).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([q]) => q);
+
+// A representative handful across methods for the preview table.
+const byType = (t: 'field' | 'lab' | 'cfd') => datasets.filter((d) => primaryType(d) === t);
+const sample = [byType('field')[0], byType('lab')[0], byType('cfd')[0], byType('field')[1], byType('lab')[1]]
+  .filter(Boolean);
 ---
 <Base>
   <!-- ============ HERO ============ -->
@@ -51,7 +62,7 @@ const teaser = [
   <section class="section">
     <div class="wrap">
       <div class="sec-head"><div class="row">
-        <h2>Five challenge areas</h2><span class="eyebrow">Research scope · rev. 2025</span>
+        <h2>Five challenge areas</h2><span class="eyebrow">Research scope</span>
       </div>
         <p class="lead">Spanning fundamental to applied research — experimental, numerical and theoretical —
           organised around five shared challenges, revised in 2025 to reflect net zero, resilience and the
@@ -73,10 +84,11 @@ const teaser = [
   <section class="section alt">
     <div class="wrap">
       <div class="sec-head"><div class="row">
-        <h2>Find urban fluid mechanics datasets</h2><span class="eyebrow">Data portal</span>
+        <h2>Explore the datasets</h2><span class="eyebrow">Data portal</span>
       </div>
-        <p class="lead">Field experiments, laboratory &amp; physical-model studies and CFD — searchable,
-          filterable, and mapped. The same records power the table, the map and the linked papers.</p>
+        <p class="lead">Field, laboratory and CFD studies of urban flow — searchable, filterable and mapped.
+          <strong>{datasets.length} datasets</strong> from {nCities} cities across {nCountries} countries power
+          the table, the map and the linked papers.</p>
       </div>
       <div class="portal-grid">
         <div class="panel">
@@ -85,28 +97,46 @@ const teaser = [
           <table>
             <thead><tr><th>Dataset</th><th>Type</th><th>City</th></tr></thead>
             <tbody>
-              {teaser.map((d) => (
-                <tr><td class="dsname">{d.name}</td><td><span class={`chip ${d.method}`}>{d.tag}</span></td><td>{d.city}</td></tr>
+              {sample.map((d) => (
+                <tr>
+                  <td class="dsname">{d.projectName}</td>
+                  <td><span class={`chip ${primaryType(d)}`}>{TYPE_LABEL[primaryType(d)]}</span></td>
+                  <td>{d.city}</td>
+                </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <a class="panel map" href={withBase('/data-portal/map')} aria-label="Open the map view">
-          <svg viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <g stroke="var(--line)" stroke-width="1" opacity=".8">
-              <path d="M0 64 H400 M0 128 H400 M0 192 H400 M0 256 H400" fill="none" />
-              <path d="M80 0 V320 M160 0 V320 M240 0 V320 M320 0 V320" fill="none" />
-            </g>
-            <path d="M150 90 q30 -26 70 -10 q40 -6 55 22 q22 34 -8 66 q-15 46 -70 40 q-52 6 -70 -34 q-24 -40 8 -68 q7 -22 25 -16 z"
-              fill="color-mix(in srgb, var(--teal) 15%, transparent)" stroke="color-mix(in srgb, var(--teal) 42%, transparent)" stroke-width="1.5" />
-          </svg>
-          <span class="pin" style="left:47%;top:52%"><i style="background:var(--teal)"></i></span>
-          <span class="pin" style="left:54%;top:42%"><i style="background:var(--sand)"></i></span>
-          <span class="pin" style="left:60%;top:62%"><i style="background:var(--green)"></i></span>
-          <span class="pin" style="left:43%;top:64%"><i style="background:var(--green)"></i></span>
-          <span class="pin" style="left:57%;top:34%"><i style="background:var(--sand)"></i></span>
-          <span class="map-cta">Map view →</span>
-        </a>
+
+        <div class="panel glance">
+          <div class="panel-top"><span class="ttl">At a glance</span>
+            <a class="count link-arrow" href={withBase('/data-portal/map')}>Map view →</a></div>
+          <div class="glance-body">
+            <div class="metric">
+              <div class="metric-h">By method</div>
+              <ul class="bars">
+                {methodOrder.map((t) => (
+                  <li>
+                    <span class="bl">{TYPE_LABEL[t]}</span>
+                    <span class="track"><i class={t} style={`width:${Math.round(methodCounts[t] / maxMethod * 100)}%`}></i></span>
+                    <span class="bv mono">{methodCounts[t]}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div class="cover">
+              <div><b>{nCities}</b><span>cities</span></div>
+              <div><b>{nCountries}</b><span>countries</span></div>
+              <div><b>{nInstitutions}</b><span>institutions</span></div>
+            </div>
+            <div class="metric">
+              <div class="metric-h">Most-measured quantities</div>
+              <div class="qchips">
+                {topQuantities.map((q) => <span class="qchip">{q}</span>)}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -164,7 +194,7 @@ const teaser = [
       linear-gradient(90deg, rgba(8,22,31,.75) 0%, rgba(8,22,31,.15) 60%, transparent 100%); }
   .hero-in { position: relative; padding: 60px 0 44px; color: #eef4f6; }
   .hero-eyebrow { color: #7fd6dc; }
-  .hero h1 { font-size: clamp(30px, 4.4vw, 48px); line-height: 1.05; color: #fff; max-width: 18ch; margin-top: 12px; }
+  .hero h1 { font-size: clamp(27px, 3.6vw, 40px); line-height: 1.08; color: #fff; max-width: 22ch; margin-top: 12px; }
   .hero .lede { font-size: clamp(15px, 1.7vw, 17.5px); color: #cfdde3; max-width: 58ch; margin-top: 16px; }
   .hero .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
   .btn.ghost.onhero { border-color: rgba(255,255,255,.4); color: #fff; background: rgba(255,255,255,.06); }
@@ -207,14 +237,29 @@ const teaser = [
   tbody td { padding: 10px 16px; border-top: 1px solid var(--line); }
   tbody tr:hover { background: var(--paper); }
   .dsname { font-weight: 600; }
-  .map { position: relative; min-height: 240px; display: block; color: var(--ink); }
-  .map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .map:hover { text-decoration: none; }
-  .pin { position: absolute; transform: translate(-50%, -100%); }
-  .pin i { display: block; width: 13px; height: 13px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
-    box-shadow: 0 2px 5px rgba(0,0,0,.3), 0 0 0 3px color-mix(in srgb, var(--card) 70%, transparent); }
-  .map-cta { position: absolute; right: 12px; bottom: 12px; font-size: 12.5px; font-weight: 700; color: var(--teal);
-    background: color-mix(in srgb, var(--card) 90%, transparent); border: 1px solid var(--line); padding: 5px 10px; border-radius: 6px; }
+
+  /* portal — at a glance */
+  .glance { display: flex; flex-direction: column; }
+  .glance-body { padding: 16px; display: flex; flex-direction: column; gap: 18px; }
+  .metric-h { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--faint);
+    font-weight: 700; margin-bottom: 9px; }
+  .bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .bars li { display: grid; grid-template-columns: 46px 1fr 22px; align-items: center; gap: 10px; }
+  .bl { font-size: 12.5px; font-weight: 600; color: var(--sub); }
+  .track { height: 9px; background: var(--paper); border-radius: 999px; overflow: hidden; }
+  .track i { display: block; height: 100%; border-radius: 999px; }
+  .track i.field { background: var(--sand); }
+  .track i.lab   { background: var(--teal); }
+  .track i.cfd   { background: var(--green); }
+  .bv { font-size: 12.5px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+  .cover { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    padding: 14px 0; border-block: 1px solid var(--line); }
+  .cover div { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .cover b { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); line-height: 1; }
+  .cover span { font-size: 11px; color: var(--faint); font-weight: 600; margin-top: 4px; }
+  .qchips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .qchip { font-size: 12px; font-weight: 600; color: var(--sub); background: var(--paper);
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; }
 
   /* meetings */
   .mgrid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
