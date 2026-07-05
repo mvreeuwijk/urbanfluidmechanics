@@ -1,0 +1,68 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { MEETINGS, formatMeetingDate, type Meeting } from '../../data/meetings';
+
+export function getStaticPaths() {
+  return MEETINGS.map((m) => ({ params: { slug: m.slug }, props: { meeting: m } }));
+}
+const { meeting } = Astro.props as { meeting: Meeting };
+// Full programmes/slides currently live on the archived Google Sites pages.
+const archivedUrl = `https://www.urbanfluidmechanics.org/meetings/${meeting.slug}`;
+---
+<Base title={meeting.label} description={`${meeting.label} — ${formatMeetingDate(meeting)}, ${meeting.host}.`}>
+  <PageHeader eyebrow="Meeting" title={meeting.label}>
+    <p class="meta">
+      <span class="mono">{formatMeetingDate(meeting)}</span>
+      <span class="dot">·</span> {meeting.host}
+      <span class="dot">·</span> {meeting.location}
+      {meeting.online && <span class="badge">Online</span>}
+    </p>
+  </PageHeader>
+
+  <section class="section">
+    <div class="wrap prose">
+      {meeting.talks && meeting.talks.length > 0 ? (
+        <>
+          <h2>Programme</h2>
+          <ol class="talks">
+            {meeting.talks.map((t) => (
+              <li>
+                <span class="t-title">{t.slidesUrl ? <a href={t.slidesUrl} target="_blank" rel="noopener">{t.title}</a> : t.title}</span>
+                {(t.speaker || t.affiliation) && (
+                  <span class="t-speaker">{t.speaker}{t.affiliation ? ` · ${t.affiliation}` : ''}</span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </>
+      ) : (
+        <div class="notice card">
+          <h2>Programme &amp; slides</h2>
+          <p>The full programme and presentation slides for this meeting are currently hosted on the archived
+            site. We are migrating them here; in the meantime you can view them at the original page:</p>
+          <p><a class="btn primary" href={archivedUrl} target="_blank" rel="noopener">Open the archived meeting page →</a></p>
+        </div>
+      )}
+
+      <p class="back"><a class="link-arrow" href="/meetings">← All meetings</a></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .meta { margin-top: 14px; color: var(--sub); font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .dot { color: var(--faint); }
+  .badge { font-family: var(--sans); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--teal-deep); background: var(--teal-soft); padding: 2px 8px; border-radius: 20px; }
+  .prose { max-width: 74ch; }
+  .prose h2 { font-size: 22px; margin-bottom: 14px; }
+  .talks { padding-left: 0; list-style: none; counter-reset: t; display: flex; flex-direction: column; gap: 14px; }
+  .talks li { counter-increment: t; padding-left: 40px; position: relative; }
+  .talks li::before { content: counter(t); position: absolute; left: 0; top: 0; font-family: var(--mono); font-size: 13px;
+    font-weight: 700; color: var(--faint); }
+  .t-title { display: block; font-weight: 600; }
+  .t-speaker { display: block; font-size: 13.5px; color: var(--sub); margin-top: 2px; }
+  .notice p { color: var(--sub); margin-bottom: 14px; }
+  .back { margin-top: 30px; }
+</style>

@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import PortalTabs from '../../components/PortalTabs.astro';
+import { papers, DATA_IS_SYNTHETIC } from '../../lib/datasets';
+
+const list = papers();
+// group by year (desc)
+const byYear = new Map<number, typeof list>();
+for (const p of list) {
+  const arr = byYear.get(p.year) ?? [];
+  arr.push(p);
+  byYear.set(p.year, arr);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+<Base title="Data Portal — Papers" description="Key articles associated with urban fluid mechanics datasets, listed chronologically.">
+  <PageHeader eyebrow="Data portal" title="Papers"
+    lead="The key article behind each dataset, most recent first. Follow a paper through to its dataset." />
+  <PortalTabs />
+
+  {DATA_IS_SYNTHETIC && (
+    <div class="wrap"><p class="synthetic-note">⚠︎ Showing <strong>synthetic sample data</strong> while the real
+      dataset spreadsheet is connected.</p></div>
+  )}
+
+  <section class="section" style="padding-top:26px">
+    <div class="wrap">
+      {years.map((year) => (
+        <div class="year-block">
+          <h2 class="year">{year}</h2>
+          <ul class="papers">
+            {byYear.get(year)!.map((p) => (
+              <li>
+                <p class="ptitle">
+                  {p.doi ? <a href={`https://doi.org/${p.doi}`} target="_blank" rel="noopener">{p.title}</a> : p.title}
+                </p>
+                <p class="pmeta">{p.institution} · dataset: <a href={`/data-portal#${p.datasetId}`}>{p.datasetName}</a></p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .synthetic-note { margin-top: 16px; font-size: 13.5px; color: var(--sub); background: var(--sand-soft);
+    border: 1px solid color-mix(in srgb, var(--sand) 30%, transparent); border-radius: 8px; padding: 10px 14px; }
+  .year-block { display: grid; grid-template-columns: 90px 1fr; gap: 20px; padding: 22px 0; border-top: 1px solid var(--line); }
+  .year-block:first-child { border-top: none; }
+  @media (max-width: 560px) { .year-block { grid-template-columns: 1fr; gap: 8px; } }
+  .year { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--faint); }
+  .papers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+  .ptitle { font-size: 15.5px; font-weight: 600; }
+  .ptitle a { color: var(--ink); }
+  .ptitle a:hover { color: var(--teal); }
+  .pmeta { font-size: 13px; color: var(--sub); margin-top: 3px; }
+</style>

@@ -1,0 +1,47 @@
+---
+import { SITE, NAV, CONTACTS, MAILING_LIST_URL } from '../consts';
+const year = new Date().getFullYear();
+---
+<footer class="footer">
+  <div class="wrap foot-grid">
+    <div class="foot-about">
+      <div class="brand-txt">{SITE.name}<small>{SITE.sub}</small></div>
+      <p>An independent, open community on flows in urban areas. New members always welcome.</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul>{NAV.map((n) => <li><a href={n.href}>{n.label}</a></li>)}</ul>
+    </div>
+    <div>
+      <h4>Get in touch</h4>
+      <ul>
+        {CONTACTS.map((c) => (
+          <li><a href={`mailto:${c.email}`}>{c.name} · {c.institution}</a></li>
+        ))}
+        <li><a href={MAILING_LIST_URL} target="_blank" rel="noopener">Join the mailing list</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap funded">
+    <span>Formerly a</span><span class="fb">UK Fluids Network</span>
+    <span>Special Interest Group · EPSRC-funded · now independent</span>
+    <span class="copy">© {year}</span>
+  </div>
+</footer>
+
+<style>
+  .footer { background: var(--paper); border-top: 1px solid var(--line); padding: 46px 0 38px; font-size: 14px; color: var(--sub); }
+  .foot-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 30px; }
+  @media (max-width: 720px) { .foot-grid { grid-template-columns: 1fr 1fr; } .foot-about { grid-column: 1 / -1; } }
+  .brand-txt { font-family: var(--serif); font-weight: 600; font-size: 17px; color: var(--ink); line-height: 1.05; margin-bottom: 10px; }
+  .brand-txt small { display: block; font-family: var(--sans); font-weight: 600; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .foot-about p { max-width: 40ch; }
+  h4 { font-family: var(--sans); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin: 0 0 12px; }
+  ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .footer a { color: var(--sub); }
+  .footer a:hover { color: var(--ink); }
+  .funded { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; gap: 12px;
+    align-items: center; flex-wrap: wrap; font-size: 12.5px; color: var(--faint); }
+  .fb { border: 1px solid var(--line); border-radius: 5px; padding: 5px 11px; font-weight: 700; color: var(--sub); background: var(--card); }
+  .copy { margin-left: auto; }
+</style>

@@ -1,0 +1,77 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import PortalTabs from '../../components/PortalTabs.astro';
+import { mapPoints, DATA_IS_SYNTHETIC } from '../../lib/datasets';
+
+const points = mapPoints();
+---
+<Base title="Data Portal — Map" description="Geographical view of urban fluid mechanics datasets.">
+  <PageHeader eyebrow="Data portal" title="Dataset map"
+    lead="Each marker is a dataset, coloured by method. Click a marker for details." />
+  <PortalTabs />
+
+  {DATA_IS_SYNTHETIC && (
+    <div class="wrap"><p class="synthetic-note">⚠︎ Showing <strong>synthetic sample data</strong> while the real
+      dataset spreadsheet is connected.</p></div>
+  )}
+
+  <div class="wrap map-wrap">
+    <div id="map" role="region" aria-label="Map of datasets"></div>
+    <div class="legend">
+      <div><b style="background:#c65a2b"></b> Field experiment</div>
+      <div><b style="background:#0d7c86"></b> Laboratory / physical</div>
+      <div><b style="background:#3c7d52"></b> CFD</div>
+    </div>
+  </div>
+
+  <script type="application/json" id="points" set:html={JSON.stringify(points)}></script>
+</Base>
+
+<style>
+  .synthetic-note { margin-top: 16px; font-size: 13.5px; color: var(--sub); background: var(--sand-soft);
+    border: 1px solid color-mix(in srgb, var(--sand) 30%, transparent); border-radius: 8px; padding: 10px 14px; }
+  .map-wrap { padding: 24px 24px 60px; }
+  #map { height: min(66vh, 620px); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); z-index: 1; }
+  .legend { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 14px; font-size: 13px; color: var(--sub); font-weight: 600; }
+  .legend div { display: flex; align-items: center; gap: 7px; }
+  .legend b { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  /* Leaflet popups adopt site type */
+  :global(.leaflet-popup-content) { font-family: var(--sans); font-size: 13px; }
+  :global(.leaflet-popup-content strong) { font-family: var(--serif); }
+</style>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet/dist/leaflet.css';
+
+  interface P { id: string; name: string; city: string; country: string; lat: number; lng: number; type: 'field'|'lab'|'cfd'; institution: string; }
+  const COLORS: Record<P['type'], string> = { field: '#c65a2b', lab: '#0d7c86', cfd: '#3c7d52' };
+  const LABEL: Record<P['type'], string> = { field: 'Field experiment', lab: 'Laboratory / physical', cfd: 'CFD' };
+
+  const points: P[] = JSON.parse(document.getElementById('points')!.textContent || '[]');
+
+  const map = L.map('map', { scrollWheelZoom: false }).setView([48, 2], 4);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 18,
+  }).addTo(map);
+
+  const markers: L.CircleMarker[] = [];
+  for (const p of points) {
+    const m = L.circleMarker([p.lat, p.lng], {
+      radius: 8, color: '#fff', weight: 2, fillColor: COLORS[p.type], fillOpacity: 0.95,
+    }).addTo(map);
+    m.bindPopup(
+      `<strong>${p.name}</strong><br>${p.institution}<br>${p.city}, ${p.country}<br><em>${LABEL[p.type]}</em>`
+    );
+    markers.push(m);
+  }
+  if (markers.length) {
+    const group = L.featureGroup(markers);
+    map.fitBounds(group.getBounds().pad(0.15));
+  }
+  // re-enable wheel zoom only after click, so page scroll isn't hijacked
+  map.on('focus', () => map.scrollWheelZoom.enable());
+  map.on('blur', () => map.scrollWheelZoom.disable());
+</script>

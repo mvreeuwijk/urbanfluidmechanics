@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { CHALLENGES } from '../data/challenges';
+---
+<Base title="Research" description="The five urban fluid mechanics challenge areas, revised in 2025.">
+  <PageHeader
+    eyebrow="Research scope · revised 2025"
+    title="Five challenge areas"
+    lead="The group spans fundamental to applied research — experimental, numerical and theoretical. In 2025 we revised our challenge areas to reflect net zero and sustainability, risks and hazards, and the rise of AI and data-driven methods, while keeping the focus firmly on the fluid mechanics."
+  />
+  <section class="section">
+    <div class="wrap challenges">
+      {CHALLENGES.map((c) => (
+        <article class="challenge" id={c.id}>
+          <div class="tag-col"><span class="tag mono">{c.id}</span></div>
+          <div class="body">
+            <h2>{c.title}</h2>
+            {c.full.map((para) => <p>{para}</p>)}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .challenges { display: flex; flex-direction: column; }
+  .challenge { display: grid; grid-template-columns: 90px 1fr; gap: 24px; padding: 34px 0; border-top: 1px solid var(--line); scroll-margin-top: 90px; }
+  .challenge:first-child { border-top: none; padding-top: 6px; }
+  @media (max-width: 620px) { .challenge { grid-template-columns: 1fr; gap: 10px; } }
+  .tag { display: inline-block; font-size: 15px; font-weight: 700; color: #fff; background: var(--teal); padding: 6px 12px; border-radius: 8px; }
+  .body h2 { font-size: clamp(20px, 2.6vw, 26px); margin-bottom: 14px; }
+  .body p { color: var(--sub); margin-bottom: 12px; max-width: 70ch; }
+  .body p:last-child { margin-bottom: 0; }
+</style>

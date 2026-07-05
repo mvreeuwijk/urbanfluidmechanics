@@ -1,0 +1,51 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { meetingsByDateDesc, formatMeetingDate } from '../../data/meetings';
+---
+<Base title="Meetings" description="Archive of Urban Fluid Mechanics meetings and their presentations, 2017 onwards.">
+  <PageHeader
+    eyebrow="Community & outputs"
+    title="Meetings & presentations"
+    lead="The group meets once or twice a year — typically around 50 participants across universities, industry and government. Talks and slides from each meeting are archived here as a lasting record of the field."
+  />
+  <section class="section">
+    <div class="wrap">
+      <ol class="meetings">
+        {meetingsByDateDesc.map((m) => (
+          <li>
+            <a class="mrow" href={`/meetings/${m.slug}`}>
+              <span class="date mono">{formatMeetingDate(m)}</span>
+              <span class="main">
+                <span class="label">{m.label}{m.online && <span class="badge">Online</span>}</span>
+                <span class="host">{m.host} · {m.location}</span>
+              </span>
+              {m.talksCount ? <span class="talks">{m.talksCount} talks</span> : <span></span>}
+              <span class="go" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .meetings { list-style: none; margin: 0; padding: 0; }
+  .mrow { display: grid; grid-template-columns: 150px 1fr auto auto; align-items: center; gap: 18px;
+    padding: 18px 4px; border-top: 1px solid var(--line); color: var(--ink); }
+  .meetings li:last-child .mrow { border-bottom: 1px solid var(--line); }
+  .mrow:hover { text-decoration: none; background: var(--paper); }
+  .date { font-size: 13px; color: var(--faint); font-weight: 700; }
+  .main { display: flex; flex-direction: column; gap: 2px; }
+  .label { font-family: var(--serif); font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .badge { font-family: var(--sans); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--teal-deep); background: var(--teal-soft); padding: 2px 7px; border-radius: 20px; }
+  .host { font-size: 13.5px; color: var(--sub); }
+  .talks { font-size: 12px; font-weight: 700; color: var(--teal-deep); background: var(--teal-soft); padding: 3px 9px; border-radius: 4px; white-space: nowrap; }
+  .go { color: var(--teal); font-weight: 700; }
+  @media (max-width: 620px) {
+    .mrow { grid-template-columns: 1fr auto; grid-template-areas: "date date" "main talks" "main go"; gap: 4px 12px; }
+    .date { grid-area: date; } .main { grid-area: main; } .talks { grid-area: talks; justify-self: end; } .go { display: none; }
+  }
+</style>

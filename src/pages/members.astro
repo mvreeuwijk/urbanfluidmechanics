@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { MEMBERS } from '../data/members';
+import { CONTACTS, MAILING_LIST_URL } from '../consts';
+
+const groups: { key: 'academic' | 'industry' | 'government'; title: string }[] = [
+  { key: 'academic', title: 'Universities & research institutes' },
+  { key: 'industry', title: 'Industry & consultancy' },
+  { key: 'government', title: 'Government & national laboratories' },
+];
+const byKind = (k: string) => MEMBERS.filter((m) => m.kind === k).sort((a, b) => a.name.localeCompare(b.name));
+---
+<Base title="Members" description="More than 250 members from over 40 universities, companies and government organisations.">
+  <PageHeader
+    eyebrow="Community"
+    title="Members"
+    lead="More than 250 members from over 40 universities, companies and governmental organisations across the UK and beyond. The group is open — there is no membership fee."
+  />
+  <section class="section">
+    <div class="wrap">
+      {groups.map((g) => (
+        <div class="group">
+          <h2 class="group-title">{g.title}</h2>
+          <ul class="grid">
+            {byKind(g.key).map((m) => (
+              <li><a href={m.url} target="_blank" rel="noopener">{m.name}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+
+      <div class="join card">
+        <h2>Get involved</h2>
+        <p>If you would like to join the community, <a href={MAILING_LIST_URL} target="_blank" rel="noopener">sign up
+          to the mailing list</a> or get in touch with one of the organisers:</p>
+        <ul class="contacts">
+          {CONTACTS.map((c) => (
+            <li><a href={`mailto:${c.email}`}>{c.name}</a> · {c.institution}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .group { margin-bottom: 40px; }
+  .group-title { font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint);
+    font-family: var(--sans); font-weight: 700; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+  .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 24px; }
+  .grid a { color: var(--ink); font-size: 15px; }
+  .grid a:hover { color: var(--teal); }
+  .join { margin-top: 8px; }
+  .join h2 { font-size: 20px; margin-bottom: 10px; }
+  .join p { color: var(--sub); max-width: 66ch; }
+  .contacts { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14.5px; color: var(--sub); }
+</style>

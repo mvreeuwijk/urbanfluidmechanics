@@ -1,0 +1,22 @@
+---
+const tabs = [
+  { href: '/data-portal', label: 'Datasets' },
+  { href: '/data-portal/map', label: 'Map' },
+  { href: '/data-portal/papers', label: 'Papers' },
+];
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+<nav class="tabs" aria-label="Data portal views">
+  <div class="wrap tabs-in">
+    {tabs.map((t) => (
+      <a href={t.href} aria-current={path === t.href ? 'page' : undefined}>{t.label}</a>
+    ))}
+  </div>
+</nav>
+<style>
+  .tabs { border-bottom: 1px solid var(--line); background: var(--bg); position: sticky; top: 64px; z-index: 10; }
+  .tabs-in { display: flex; gap: 4px; }
+  .tabs a { padding: 13px 16px; font-size: 14.5px; font-weight: 600; color: var(--sub); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabs a:hover { color: var(--ink); text-decoration: none; }
+  .tabs a[aria-current="page"] { color: var(--teal-deep); border-bottom-color: var(--teal); }
+</style>

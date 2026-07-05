@@ -1,0 +1,25 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# local exploration artifacts (not part of the site)
+*.png
+.playwright-mcp/
+ChallengesAreas*.pptx
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+# env
+.env
+.env.*
+!.env.example
+
+# tmp dir
+/tmp/

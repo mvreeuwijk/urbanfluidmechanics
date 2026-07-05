@@ -1,0 +1,138 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import PortalTabs from '../../components/PortalTabs.astro';
+import { datasets, facet, primaryType, TYPE_LABEL, DATA_IS_SYNTHETIC } from '../../lib/datasets';
+
+const methods = facet('method');
+const morphologies = facet('morphology');
+const quantities = facet('quantities');
+const institutions = facet('institution');
+
+const searchable = (d: typeof datasets[number]) =>
+  [d.projectName, d.description, d.correspondingAuthor.name, d.institution, d.keyArticle.title, d.city, d.country,
+   ...d.method, ...d.morphology, ...d.quantities].join(' ').toLowerCase();
+---
+<Base title="Data Portal" description="Searchable, filterable datasets on urban fluid mechanics — field experiments, laboratory and physical-model studies, and CFD.">
+  <PageHeader
+    eyebrow="Data portal"
+    title="Urban fluid mechanics datasets"
+    lead="Field experiments, laboratory & physical-model studies and CFD, contributed by the community. Search and filter below; the same records appear on the map and in the papers list. When multiple filters are set, all must match."
+  />
+  <PortalTabs />
+
+  {DATA_IS_SYNTHETIC && (
+    <div class="wrap"><p class="synthetic-note">⚠︎ Showing <strong>synthetic sample data</strong> while the real
+      dataset spreadsheet is connected — structure matches the live portal.</p></div>
+  )}
+
+  <section class="section" style="padding-top:26px">
+    <div class="wrap">
+      <form class="filters" id="filters" aria-label="Filter datasets">
+        <input type="search" id="q" placeholder="Search datasets, authors, papers…" aria-label="Search everything" />
+        <select id="f-method" aria-label="Method"><option value="">Method</option>{methods.map((m) => <option>{m}</option>)}</select>
+        <select id="f-morph" aria-label="Morphology"><option value="">Morphology</option>{morphologies.map((m) => <option>{m}</option>)}</select>
+        <select id="f-quant" aria-label="Quantities"><option value="">Quantities</option>{quantities.map((m) => <option>{m}</option>)}</select>
+        <select id="f-inst" aria-label="Institution"><option value="">Institution</option>{institutions.map((m) => <option>{m}</option>)}</select>
+        <button type="button" id="clear" class="btn ghost">Clear</button>
+      </form>
+      <p class="count" id="count" aria-live="polite"></p>
+
+      <div class="ds-list" id="list">
+        {datasets.map((d) => (
+          <article class="ds"
+            data-method={d.method.join('|')}
+            data-morph={d.morphology.join('|')}
+            data-quant={d.quantities.join('|')}
+            data-inst={d.institution}
+            data-search={searchable(d)}>
+            <div class="ds-head">
+              <h3>{d.projectName}</h3>
+              <span class={`chip ${primaryType(d)}`}>{TYPE_LABEL[primaryType(d)]}</span>
+            </div>
+            <p class="ds-desc">{d.description}</p>
+            <p class="ds-meta">
+              <span><strong>Method:</strong> {d.method.join(', ')}</span>
+              <span><strong>Quantities:</strong> {d.quantities.join(', ')}</span>
+              <span><strong>Morphology:</strong> {d.morphology.join(', ')}</span>
+              <span><strong>Institution:</strong> {d.institution} · {d.city}, {d.country}</span>
+            </p>
+            <div class="ds-links">
+              <span><strong>Corresponding author:</strong> <a href={`mailto:${d.correspondingAuthor.email}`}>{d.correspondingAuthor.name}</a></span>
+              {d.projectUrl && <span><strong>Project:</strong> <a href={d.projectUrl} target="_blank" rel="noopener">link</a></span>}
+              {d.dataAvailableFrom && <span><strong>Data from:</strong> {d.dataAvailableFrom}</span>}
+              <span><strong>Key article:</strong>{' '}
+                {d.keyArticle.doi
+                  ? <a href={`https://doi.org/${d.keyArticle.doi}`} target="_blank" rel="noopener">{d.keyArticle.title}</a>
+                  : d.keyArticle.title}{' '}({d.keyArticle.year})</span>
+            </div>
+            {d.additionalInfo && <p class="ds-add">{d.additionalInfo}</p>}
+          </article>
+        ))}
+      </div>
+      <p class="empty" id="empty" hidden>No datasets match these filters. <button type="button" id="clear2" class="link-arrow">Clear all →</button></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .synthetic-note { margin-top: 16px; font-size: 13.5px; color: var(--sub); background: var(--sand-soft);
+    border: 1px solid color-mix(in srgb, var(--sand) 30%, transparent); border-radius: 8px; padding: 10px 14px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .filters input, .filters select { font: inherit; font-size: 14px; padding: 9px 12px; border: 1px solid var(--line);
+    border-radius: 7px; background: var(--card); color: var(--ink); }
+  .filters input { flex: 1 1 240px; }
+  .filters select { cursor: pointer; }
+  .count { margin: 16px 0 20px; font-size: 13px; color: var(--faint); font-weight: 600; }
+  .ds-list { display: flex; flex-direction: column; gap: 14px; }
+  .ds { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .ds-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .ds-head h3 { font-size: 18px; }
+  .ds-desc { margin-top: 6px; color: var(--sub); font-size: 14.5px; }
+  .ds-meta { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 4px 22px; font-size: 12.5px; color: var(--sub); }
+  .ds-meta strong { color: var(--ink); font-weight: 600; }
+  .ds-links { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 12.5px; color: var(--sub); }
+  .ds-links strong { color: var(--ink); font-weight: 600; }
+  .ds-add { margin-top: 10px; font-size: 12.5px; color: var(--faint); font-style: italic; }
+  .empty { margin-top: 24px; color: var(--sub); }
+</style>
+
+<script>
+  const list = document.getElementById('list')!;
+  const cards = Array.from(list.querySelectorAll<HTMLElement>('.ds'));
+  const q = document.getElementById('q') as HTMLInputElement;
+  const fMethod = document.getElementById('f-method') as HTMLSelectElement;
+  const fMorph = document.getElementById('f-morph') as HTMLSelectElement;
+  const fQuant = document.getElementById('f-quant') as HTMLSelectElement;
+  const fInst = document.getElementById('f-inst') as HTMLSelectElement;
+  const count = document.getElementById('count')!;
+  const empty = document.getElementById('empty') as HTMLElement;
+
+  const has = (attr: string, val: string) =>
+    !val || (attr || '').split('|').some((x) => x === val);
+
+  function apply() {
+    const term = q.value.trim().toLowerCase();
+    let shown = 0;
+    for (const c of cards) {
+      const ok =
+        (!term || (c.dataset.search || '').includes(term)) &&
+        has(c.dataset.method || '', fMethod.value) &&
+        has(c.dataset.morph || '', fMorph.value) &&
+        has(c.dataset.quant || '', fQuant.value) &&
+        (!fInst.value || c.dataset.inst === fInst.value);
+      c.hidden = !ok;
+      if (ok) shown++;
+    }
+    count.textContent = `${shown} of ${cards.length} datasets`;
+    empty.hidden = shown !== 0;
+  }
+  function clearAll() {
+    q.value = ''; fMethod.value = ''; fMorph.value = ''; fQuant.value = ''; fInst.value = '';
+    apply();
+  }
+  [q, fMethod, fMorph, fQuant, fInst].forEach((el) => el.addEventListener('input', apply));
+  document.getElementById('clear')?.addEventListener('click', clearAll);
+  document.getElementById('clear2')?.addEventListener('click', clearAll);
+  apply();
+</script>

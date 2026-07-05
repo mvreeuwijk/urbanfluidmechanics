@@ -1,0 +1,54 @@
+---
+import { featuredMeeting, formatMeetingDate } from '../data/meetings';
+
+// Computed at build time. Shows the NEXT upcoming meeting, or falls back to the
+// LAST meeting once it has passed. Hidden entirely if there are no meetings.
+const featured = featuredMeeting(new Date());
+---
+{featured && (
+  <div class="announce" id="announce">
+    <div class="wrap ann-in">
+      <span class="ann-tag">{featured.kind === 'next' ? 'Next meeting' : 'Last meeting'}</span>
+      <span class="txt">
+        {featured.meeting.label} · {formatMeetingDate(featured.meeting)} · {featured.meeting.host}
+      </span>
+      <a href={`/meetings/${featured.meeting.slug}`}>
+        {featured.kind === 'next' ? 'See the programme →' : 'View slides →'}
+      </a>
+      <button class="ann-x" type="button" aria-label="Dismiss announcement" data-dismiss>×</button>
+    </div>
+  </div>
+)}
+
+<style>
+  .announce { background: var(--ink); color: #eef4f6; font-size: 13px; }
+  :root[data-theme="dark"] .announce { background: #0f2129; border-bottom: 1px solid var(--line); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .announce { background: #0f2129; border-bottom: 1px solid var(--line); }
+  }
+  .ann-in { display: flex; align-items: center; gap: 12px; padding: 9px 0; flex-wrap: wrap; }
+  .ann-tag {
+    font-family: var(--mono); font-weight: 700; font-size: 10.5px; letter-spacing: .09em;
+    text-transform: uppercase; color: #7fd6dc; border: 1px solid rgba(127,214,220,.45);
+    padding: 2px 9px; border-radius: 20px; white-space: nowrap;
+  }
+  .txt { color: #dbe7eb; }
+  .announce a { color: #fff; font-weight: 700; white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,.45); }
+  .announce a:hover { text-decoration: none; border-bottom-color: #fff; }
+  .ann-x { margin-left: auto; background: none; border: none; color: #93aab3; font-size: 19px; line-height: 1; cursor: pointer; padding: 0 2px; }
+  .ann-x:hover { color: #fff; }
+</style>
+
+<script>
+  const bar = document.getElementById('announce');
+  const KEY = 'ufm-announce-dismissed';
+  if (bar) {
+    // Re-show only when the announcement content changes (keyed by its text).
+    const sig = bar.querySelector('.txt')?.textContent?.trim() ?? '';
+    if (sessionStorage.getItem(KEY) === sig) bar.hidden = true;
+    bar.querySelector('[data-dismiss]')?.addEventListener('click', () => {
+      bar.hidden = true;
+      sessionStorage.setItem(KEY, sig);
+    });
+  }
+</script>

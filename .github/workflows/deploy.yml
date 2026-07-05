@@ -1,0 +1,41 @@
+name: Build & deploy to GitHub Pages
+
+on:
+  # deploy on every push to main
+  push:
+    branches: [main]
+  # nightly rebuild so edits to the source Google Sheet appear within a day
+  schedule:
+    - cron: '0 3 * * *'   # 03:00 UTC daily
+  # allow manual runs from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# allow one concurrent deployment; don't cancel an in-progress one
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build with Astro
+        uses: withastro/action@v3   # installs deps, runs `astro build`, uploads the Pages artifact
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

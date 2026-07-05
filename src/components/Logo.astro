@@ -1,0 +1,26 @@
+---
+// Placeholder brand mark: contained building cluster with heat/flow streamlines.
+// A proper logo is a later design pass.
+interface Props { size?: number; class?: string }
+const { size = 27, class: cls = '' } = Astro.props;
+---
+<svg class={cls} width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="var(--teal-soft)"
+        stroke="color-mix(in srgb, var(--teal) 40%, transparent)" />
+  <g fill="var(--teal-deep)">
+    <rect x="7" y="16" width="4.5" height="10" rx="1" />
+    <rect x="13.2" y="11" width="4.5" height="15" rx="1" />
+    <rect x="19.5" y="18" width="4.5" height="8" rx="1" />
+  </g>
+  <path class="flow" d="M4 9 C 11 5, 16 12, 22 8 S 27 8 28 8.5"
+        stroke="var(--sand)" stroke-width="2" fill="none" stroke-linecap="round" />
+  <path class="flow" d="M4 13 C 12 10, 18 15, 28 12"
+        stroke="var(--teal)" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".85"
+        style="animation-delay:-1.5s" />
+</svg>
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .flow { stroke-dasharray: 5 9; animation: flowdash 6s linear infinite; }
+    @keyframes flowdash { to { stroke-dashoffset: -160; } }
+  }
+</style>

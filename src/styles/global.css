@@ -1,0 +1,84 @@
+/* =========================================================================
+   Urban Fluid Mechanics — design system  (Direction A · "Boundary Layer")
+   Tokens + base element styles + shared component classes.
+   ========================================================================= */
+
+:root {
+  /* palette — light */
+  --paper:#f2f5f8; --bg:#ffffff; --ink:#112433; --sub:#42586a; --faint:#7d92a2;
+  --line:#d7e0e7; --teal:#0d7c86; --teal-deep:#0a5f68; --sand:#c65a2b; --sand-soft:#f6e6dd;
+  --teal-soft:#e0eef0; --card:#ffffff; --green:#3c7d52;
+  --shadow:0 1px 2px rgba(17,36,51,.05), 0 10px 28px rgba(17,36,51,.06);
+
+  /* type */
+  --serif:"Source Serif 4 Variable", Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  --sans:"Public Sans Variable", system-ui, "Segoe UI", -apple-system, Roboto, sans-serif;
+  --mono:ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+
+  /* layout */
+  --wrap:1120px;
+  --radius:8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:#0d1720; --bg:#0a121a; --ink:#e7eef3; --sub:#9fb2c0; --faint:#6a808f;
+    --line:#1f2f3d; --teal:#3bb3bd; --teal-deep:#63c6ce; --sand:#e07a4d; --sand-soft:#2c1d14;
+    --teal-soft:#0f2830; --card:#111f2b; --green:#7fc194;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 30px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"] {
+  --paper:#0d1720; --bg:#0a121a; --ink:#e7eef3; --sub:#9fb2c0; --faint:#6a808f;
+  --line:#1f2f3d; --teal:#3bb3bd; --teal-deep:#63c6ce; --sand:#e07a4d; --sand-soft:#2c1d14;
+  --teal-soft:#0f2830; --card:#111f2b; --green:#7fc194;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 30px rgba(0,0,0,.5);
+}
+
+/* ---------- reset / base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--sans); line-height: 1.6; font-size: 16px;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; display: block; }
+:focus-visible { outline: 2.5px solid var(--teal); outline-offset: 2px; border-radius: 3px; }
+
+/* ---------- layout helpers ---------- */
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: 24px; }
+.mono { font-family: var(--mono); }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--teal); font-family: var(--sans); }
+.section { padding-block: 58px; }
+.section.alt { background: var(--paper); border-block: 1px solid var(--line); }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+/* section heading (editorial rule) */
+.sec-head { margin-bottom: 30px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); }
+.sec-head .row { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.sec-head h2 { font-size: clamp(23px, 3vw, 31px); }
+.sec-head .lead { color: var(--sub); margin-top: 10px; font-size: 15.5px; max-width: 68ch; }
+
+/* ---------- buttons ---------- */
+.btn { display:inline-flex; align-items:center; gap:8px; padding:11px 20px; border-radius:var(--radius);
+  font-family:var(--sans); font-weight:700; font-size:14.5px; border:1.5px solid transparent; cursor:pointer; }
+.btn:hover { text-decoration: none; }
+.btn.primary { background: var(--teal); color:#fff; }
+.btn.primary:hover { background: var(--teal-deep); }
+.btn.ghost { border-color: var(--line); color: var(--ink); background: transparent; }
+.btn.ghost:hover { border-color: var(--teal); }
+.link-arrow { color: var(--teal); font-weight: 700; font-family: var(--sans); }
+
+/* ---------- chips (dataset method etc.) ---------- */
+.chip { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; font-family:var(--sans); }
+.chip.lab   { background: var(--teal-soft); color: var(--teal-deep); }
+.chip.field { background: var(--sand-soft); color: var(--sand); }
+.chip.cfd   { background: color-mix(in srgb, var(--green) 16%, transparent); color: var(--green); }
+
+/* ---------- cards ---------- */
+.card { background: var(--card); border:1px solid var(--line); border-radius: 12px; padding: 20px; box-shadow: var(--shadow); }
