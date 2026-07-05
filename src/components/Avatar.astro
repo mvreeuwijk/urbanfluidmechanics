@@ -1,0 +1,29 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+// A person avatar: a real portrait if `img` is supplied, otherwise a clean
+// monogram (initials on a deterministic brand colour). Drop a photo into any
+// person later by passing `img`.
+interface Props { name: string; img?: ImageMetadata; size?: number; }
+const { name, img, size = 76 } = Astro.props;
+
+const cleaned = name.replace(/^(Prof|Dr|Mr|Mrs|Ms)\.?\s+/i, '').trim();
+const parts = cleaned.split(/\s+/).filter(Boolean);
+const initials = ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+
+const PALETTE = ['#0d7c86', '#1b5f8b', '#c65a2b', '#3c7d52', '#0a5f68', '#8a5a2b'];
+let h = 0;
+for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+const bg = PALETTE[h % PALETTE.length];
+---
+{img ? (
+  <Image class="avatar" src={img} alt={name} width={size} height={size} />
+) : (
+  <span class="avatar mono-av" aria-hidden="true"
+    style={`--bg:${bg};width:${size}px;height:${size}px;font-size:${Math.round(size * 0.34)}px`}>{initials}</span>
+)}
+<style>
+  .avatar { border-radius: 50%; display: inline-grid; place-items: center; flex: none; object-fit: cover; box-shadow: 0 1px 2px rgba(17,36,51,.12); }
+  .mono-av { background: var(--bg); color: #fff; font-family: var(--serif); font-weight: 600; letter-spacing: .01em; user-select: none; }
+</style>

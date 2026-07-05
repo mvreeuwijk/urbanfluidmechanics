@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Avatar from '../components/Avatar.astro';
+import { LEADS, STEERING, FORMER } from '../data/organisation';
+
+const groups = [
+  { title: 'Leads', note: 'The community is led by three co-chairs.', people: LEADS },
+  { title: 'Steering committee', note: 'Guiding the group across academia, industry and government.', people: STEERING },
+  { title: 'Former committee members', note: 'With gratitude for their part in building the community.', people: FORMER, muted: true },
+];
+---
+<Base title="People" description="The people who lead and steer the Urban Fluid Mechanics community.">
+  <PageHeader
+    eyebrow="Organisation"
+    title="People"
+    lead="The community is led by three co-chairs and guided by a steering committee drawn from academia, industry and government. We gratefully acknowledge their work — and that of our former committee members."
+  />
+  <section class="section">
+    <div class="wrap">
+      {groups.map((g) => (
+        <div class={`pgroup ${g.muted ? 'is-muted' : ''}`}>
+          <div class="pgroup-head">
+            <h2>{g.title}</h2>
+            <p>{g.note}</p>
+          </div>
+          <ul class="people-grid">
+            {g.people.map((p) => (
+              <li class="person">
+                <Avatar name={p.name} size={76} />
+                <div class="p-body">
+                  <span class="p-name">{p.url ? <a href={p.url} target="_blank" rel="noopener">{p.name}</a> : p.name}</span>
+                  <span class="p-inst">{p.institution}</span>
+                  {p.email && <a class="p-mail" href={`mailto:${p.email}`}>Email →</a>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .pgroup { margin-bottom: 46px; }
+  .pgroup-head { border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 26px; }
+  .pgroup-head h2 { font-size: clamp(20px, 2.6vw, 26px); }
+  .pgroup-head p { color: var(--sub); margin-top: 6px; font-size: 15px; }
+
+  .people-grid { list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 26px 20px; }
+  .person { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+  .p-body { display: flex; flex-direction: column; gap: 2px; }
+  .p-name { font-weight: 600; font-size: 15px; }
+  .p-name a { color: var(--ink); }
+  .p-name a:hover { color: var(--teal); }
+  .p-inst { font-size: 13px; color: var(--sub); }
+  .p-mail { font-size: 12.5px; font-weight: 600; color: var(--teal); margin-top: 2px; }
+
+  .is-muted .person { opacity: .9; }
+</style>

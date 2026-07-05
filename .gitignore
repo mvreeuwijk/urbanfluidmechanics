@@ -30,6 +30,7 @@ npm-debug.log*
 
 # browser-eval / scraping scratch artifacts
 chosen-photos*.json
+photos-*.json
 meeting-images.json
 contact-datauri.txt
 contact*.jpg
