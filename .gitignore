@@ -7,6 +7,9 @@ node_modules/
 
 # local exploration artifacts (not part of the site)
 *.png
+# ...but real image assets ARE part of the site
+!src/assets/images/*.png
+!public/favicon.svg
 .playwright-mcp/
 ChallengesAreas*.pptx
 
